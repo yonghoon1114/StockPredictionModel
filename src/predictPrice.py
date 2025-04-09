@@ -18,7 +18,6 @@ def load_data_for_prediction(path: str) -> pd.DataFrame:
         "stock_close": last_row["stock_close"],
         "rate_close": last_row["rate_close"],
         "nasdaq_close": last_row["nasdaq_close"],
-        "rsi": last_row["rsi"]  # rsi도 포함시킴
     }])
     return X_pred
 

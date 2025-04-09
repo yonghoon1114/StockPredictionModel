@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 import os
 
-def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = "data/raw"):
+def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = "data/raw/AAPL"):
     # yfinance에서 데이터 다운로드
     data = yf.download(ticker, start=start, end=end)
 
@@ -17,4 +17,4 @@ def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = "data/r
     print(f"Saved: {file_path}")
 
 if __name__ == "__main__":
-    fetch_stock_data("AAPL", "2020-01-01", "2025-04-05")
+    fetch_stock_data("AAPL", "1910-01-01", "2025-04-08")

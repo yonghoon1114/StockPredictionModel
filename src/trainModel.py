@@ -11,8 +11,8 @@ def load_data(path: str) -> pd.DataFrame:
     return df
 
 def train_model(data: pd.DataFrame):
-    # feature와 target 분리
-    X = data[["stock_close", "rate_close", "nasdaq_close", "rsi"]]
+    # RSI 제거하고 feature 설정
+    X = data[["stock_close", "rate_close", "nasdaq_close"]]
     y = data["target"]
 
     # 시간 순서 유지한 채로 학습/테스트 분할
@@ -26,7 +26,11 @@ def train_model(data: pd.DataFrame):
     y_pred = model.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
     print(f"Mean Squared Error: {mse:.4f}")
+
+    # 모델 저장
+    os.makedirs("models", exist_ok=True)
     joblib.dump(model, os.path.join("models", "linear_model.joblib"))
+
     return model
 
 if __name__ == "__main__":
