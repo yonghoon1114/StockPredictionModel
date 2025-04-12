@@ -1,1 +1,2 @@
-companyCode = "META"
+companyCode = "PLTR"
+sequenceLength = 30

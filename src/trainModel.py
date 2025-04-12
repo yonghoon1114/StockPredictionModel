@@ -7,20 +7,20 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import joblib
-from config import companyCode
+from config import companyCode, sequenceLength
 
 def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["Date"], index_col="Date")
     return df
 
-def create_sequences(data, sequence_length):
+def create_sequences(data, sequenceLength):
     X, y = [], []
-    for i in range(len(data) - sequence_length):
-        X.append(data[i:i + sequence_length])
-        y.append(data[i + sequence_length, 0])  # 예측할 대상은 stock_close (0번째 열)
+    for i in range(len(data) - sequenceLength):
+        X.append(data[i:i + sequenceLength])
+        y.append(data[i + sequenceLength, 0])  # 예측할 대상은 stock_close (0번째 열)
     return np.array(X), np.array(y)
 
-def train_lstm_model(df: pd.DataFrame, sequence_length=200):
+def train_lstm_model(df: pd.DataFrame):
     df = df[["stock_close", "rate_close", "nasdaq_close", "target", "Revenue", "NetIncome", "TotalAssets"]].dropna()
 
     # 정규화
@@ -40,7 +40,7 @@ def train_lstm_model(df: pd.DataFrame, sequence_length=200):
 
     # 시퀀스 생성
     scaled_features = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq,scaled_Revenue, scaled_NetIncome,scaled_totalAssets))
-    X, y = create_sequences(scaled_features, sequence_length)
+    X, y = create_sequences(scaled_features, sequenceLength)
 
     # 학습/테스트 분할
     split = int(len(X) * 0.8)
@@ -54,7 +54,7 @@ def train_lstm_model(df: pd.DataFrame, sequence_length=200):
     # 모델 정의
     # 모델 정의 시 input_shape 수정
     model = Sequential([
-        LSTM(50, activation='relu', input_shape=(sequence_length, 6)),
+        LSTM(50, activation='relu', input_shape=(sequenceLength, 6)),
         Dense(1)
     ])  
     model.compile(optimizer='adam', loss='mse')

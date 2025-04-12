@@ -4,7 +4,7 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
-from config import companyCode
+from config import companyCode, sequenceLength
 
 
 def load_lstm_model(model_path: str):
@@ -21,13 +21,12 @@ def load_data_for_prediction(
     scaler_Revenue: MinMaxScaler,
     scaler_NetIncome: MinMaxScaler,
     scaler_TotalAssets: MinMaxScaler,
-    sequence_length: int = 10
 ) -> np.ndarray:
     df = pd.read_csv(path, parse_dates=["Date"])
     df = df.sort_values("Date")
 
     # 가장 최근 시퀀스 추출
-    recent_seq = df[["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets"]].iloc[-sequence_length:]
+    recent_seq = df[["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets"]].iloc[-sequenceLength:]
 
     # 각 feature별로 scaler를 이용해 변환
     scaled_stock = scaler_stock.transform(recent_seq[["stock_close"]])
@@ -48,16 +47,16 @@ def load_data_for_prediction(
     ))
 
     # LSTM 입력 형태: (samples, time steps, features)
-    return scaled_features.reshape(1, sequence_length, 6)
+    return scaled_features.reshape(1, sequenceLength, 6)
 
 def predict_future_days(
-    model, df, scalers, sequence_length=100, days=30
+    model, df, scalers, days=30
 ):
     scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets = scalers
 
     df_sorted = df.sort_values("Date").copy()
 
-    recent_seq = df_sorted[["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets"]].iloc[-sequence_length:]
+    recent_seq = df_sorted[["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets"]].iloc[-sequenceLength:]
 
     predictions = []
 
@@ -71,7 +70,7 @@ def predict_future_days(
         scaled_TotalAssets = scaler_TotalAssets.transform(recent_seq[["TotalAssets"]])
 
         X = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq, scaled_Revenue, scaled_NetIncome, scaled_TotalAssets))
-        X_input = X.reshape(1, sequence_length, 6)
+        X_input = X.reshape(1, sequenceLength, 6)
 
         pred_scaled = model.predict(X_input)[0][0]
         pred_price = scaler_stock.inverse_transform([[pred_scaled]])[0][0]
@@ -110,7 +109,6 @@ if __name__ == "__main__":
         scaler_Revenue,
         scaler_NetIncome,
         scaler_TotalAssets,
-        sequence_length=200
     )
 
     # 예측
@@ -126,7 +124,6 @@ if __name__ == "__main__":
     predictions = predict_future_days(
         model, df,
         scalers=[scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets],
-        sequence_length=100,
         days=50
     )
 
