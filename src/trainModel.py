@@ -7,6 +7,7 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import joblib
+from config import companyCode
 
 def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["Date"], index_col="Date")
@@ -69,16 +70,16 @@ def train_lstm_model(df: pd.DataFrame, sequence_length=200):
 
     # 모델 및 스케일러 저장
     os.makedirs("models/scalers", exist_ok=True)
-    model.save(os.path.join("models", "lstm_model.h5"))
-    joblib.dump(scaler_stock, "models/scalers/scaler_stock.joblib")
+    model.save(os.path.join("models", f"lstm_model_for_{companyCode}.h5"))
+    joblib.dump(scaler_stock, f"models/scalers/scaler_stock_{companyCode}.joblib")
     joblib.dump(scaler_rate, "models/scalers/scaler_rate.joblib")
     joblib.dump(scaler_nasdaq, "models/scalers/scaler_nasdaq.joblib")
-    joblib.dump(scaler_TotalAssets,"models/scalers/scaler_TotalAssets.joblib")
-    joblib.dump(scaler_Revenue,"models/scalers/scaler_Revenue.joblib")
-    joblib.dump(scaler_NetIncome,"models/scalers/scaler_NetIncome.joblib")
+    joblib.dump(scaler_TotalAssets,f"models/scalers/scaler_TotalAssets_{companyCode}.joblib")
+    joblib.dump(scaler_Revenue,f"models/scalers/scaler_Revenue_{companyCode}.joblib")
+    joblib.dump(scaler_NetIncome,f"models/scalers/scaler_NetIncome_{companyCode}.joblib")
     return model
 
 if __name__ == "__main__":
-    data_path = os.path.join("data", "processed", "merged.csv")
+    data_path = os.path.join("data", "processed", f"{companyCode}_merged.csv")
     df = load_data(data_path)
     trained_model = train_lstm_model(df)

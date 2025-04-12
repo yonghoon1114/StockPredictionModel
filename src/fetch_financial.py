@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import os
+from config import companyCode
 
 def get_quarter_range(date: pd.Timestamp):
     # 분기 시작/종료일 구하기
@@ -20,7 +21,7 @@ def get_quarter_range(date: pd.Timestamp):
         end = pd.Timestamp(f"{year}-12-31")
     return start, end
 
-def fetch_quarterly_financials_merged(ticker: str, save_dir: str = "data/raw/AAPL"):
+def fetch_quarterly_financials_merged(ticker: str, save_dir: str = f"data/raw/{companyCode}"):
     os.makedirs(save_dir, exist_ok=True)
     
     stock = yf.Ticker(ticker)
@@ -58,4 +59,4 @@ def fetch_quarterly_financials_merged(ticker: str, save_dir: str = "data/raw/AAP
     print(f"Saved expanded file: {filepath}")
 
 if __name__ == "__main__":
-    fetch_quarterly_financials_merged("AAPL")
+    fetch_quarterly_financials_merged(f"{companyCode}")

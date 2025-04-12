@@ -4,6 +4,8 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
+from config import companyCode
+
 
 def load_lstm_model(model_path: str):
     return load_model(model_path, compile=False)
@@ -84,17 +86,17 @@ def predict_future_days(
     return predictions
 
 if __name__ == "__main__":
-    model_path = os.path.join("models", "lstm_model.h5")
+    model_path = os.path.join("models", f"lstm_model_for_{companyCode}.h5")
     scaler_dir = os.path.join("models", "scalers")
-    data_path = os.path.join("data", "processed", "merged.csv")
+    data_path = os.path.join("data", "processed", f"{companyCode}_merged.csv")
 
     # 스케일러 로드
-    scaler_stock = load_scaler(os.path.join(scaler_dir, "scaler_stock.joblib"))
+    scaler_stock = load_scaler(os.path.join(scaler_dir, f"scaler_stock_{companyCode}.joblib"))
     scaler_rate = load_scaler(os.path.join(scaler_dir, "scaler_rate.joblib"))
     scaler_nasdaq = load_scaler(os.path.join(scaler_dir, "scaler_nasdaq.joblib"))
-    scaler_Revenue = load_scaler(os.path.join(scaler_dir, "scaler_Revenue.joblib"))
-    scaler_NetIncome = load_scaler(os.path.join(scaler_dir, "scaler_NetIncome.joblib"))
-    scaler_TotalAssets = load_scaler(os.path.join(scaler_dir, "scaler_TotalAssets.joblib"))
+    scaler_Revenue = load_scaler(os.path.join(scaler_dir, f"scaler_Revenue_{companyCode}.joblib"))
+    scaler_NetIncome = load_scaler(os.path.join(scaler_dir, f"scaler_NetIncome_{companyCode}.joblib"))
+    scaler_TotalAssets = load_scaler(os.path.join(scaler_dir, f"scaler_TotalAssets_{companyCode}.joblib"))
 
     # 모델 로드
     model = load_lstm_model(model_path)
@@ -125,7 +127,7 @@ if __name__ == "__main__":
         model, df,
         scalers=[scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets],
         sequence_length=100,
-        days=10
+        days=50
     )
 
     for i, p in enumerate(predictions, 1):
