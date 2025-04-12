@@ -17,4 +17,4 @@ def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = "data/r
     print(f"Saved: {file_path}")
 
 if __name__ == "__main__":
-    fetch_stock_data("AAPL", "1910-01-01", "2025-04-08")
+    fetch_stock_data("AAPL", "1910-01-01", "2026-04-11")

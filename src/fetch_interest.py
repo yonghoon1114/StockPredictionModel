@@ -1,7 +1,7 @@
 import yfinance as yf
 import os
 
-def fetch_interest_rate_data(ticker="^IRX", start="1910-01-01", end="2025-04-08", save_path="data/raw/INTEREST"):
+def fetch_interest_rate_data(ticker="^IRX", start="1910-01-01", end="2026-04-11", save_path="data/raw/INTEREST"):
     # yfinance로 금리 데이터 다운로드
     data = yf.download(ticker, start=start, end=end)
 

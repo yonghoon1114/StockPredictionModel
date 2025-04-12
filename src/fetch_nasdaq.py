@@ -1,7 +1,7 @@
 import yfinance as yf
 import os
 
-def fetch_nasdaq_index_data(ticker="^IXIC", start="1910-01-01", end="2025-04-08", save_path="data/raw/NASDAQ"):
+def fetch_nasdaq_index_data(ticker="^IXIC", start="1910-01-01", end="2026-04-11", save_path="data/raw/NASDAQ"):
     # yfinance로 NASDAQ Composite Index 데이터 다운로드
     data = yf.download(ticker, start=start, end=end)
 

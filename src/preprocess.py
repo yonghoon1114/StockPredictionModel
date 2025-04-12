@@ -35,10 +35,10 @@ def load_and_merge_data(stock_path: str, rate_path: str, nasdaq_path: str, finan
     return df
 
 if __name__ == "__main__":
-    stock_file = os.path.join("data", "raw", "AAPL", "AAPL_1910-01-01_2025-04-08.csv")
-    rate_file = os.path.join("data", "raw", "INTEREST", "IRX_1910-01-01_2025-04-08.csv")
-    nasdaq_file = os.path.join("data", "raw", "NASDAQ", "IXIC_1910-01-01_2025-04-08.csv")
-    financial_file = os.path.join("data", "raw", "AAPL", "AAPL_quarterly_financials_merged.csv")
+    stock_file = os.path.join("data", "raw", "AAPL", "AAPL_1910-01-01_2026-04-11.csv")
+    rate_file = os.path.join("data", "raw", "INTEREST", "IRX_1910-01-01_2026-04-11.csv")
+    nasdaq_file = os.path.join("data", "raw", "NASDAQ", "IXIC_1910-01-01_2026-04-11.csv")
+    financial_file = os.path.join("data", "raw", "AAPL", "AAPL_quarterly_financials_expanded.csv")
     
     merged_df = load_and_merge_data(stock_file, rate_file, nasdaq_file, financial_file)
     # 저장 경로 지정
