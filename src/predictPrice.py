@@ -130,5 +130,7 @@ if __name__ == "__main__":
         days=50
     )
 
-    for i, p in enumerate(predictions, 1):
-        print(f"Day {i} predicted price: {p:.2f}")
+    # for i, p in enumerate(predictions, 1):
+    #     print(f"Day {i} predicted price: {p:.2f}")
+    
+    print(f"Estimated value of stock of {companyCode} : {predictions[-1]:.2f}")

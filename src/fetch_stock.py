@@ -3,7 +3,8 @@ import pandas as pd
 import os
 from config import companyCode
 
-def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = f"data/raw/{companyCode}"):
+os.makedirs(f"data/raw/Companies/{companyCode}", exist_ok=True)
+def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = f"data/raw/Companies/{companyCode}"):
     # yfinance에서 데이터 다운로드
     data = yf.download(ticker, start=start, end=end)
 

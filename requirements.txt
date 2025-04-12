@@ -9,3 +9,4 @@ yfinance
 beautifulsoup4
 requests
 nltk
+tensorflow

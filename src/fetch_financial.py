@@ -3,7 +3,9 @@ import pandas as pd
 import os
 from config import companyCode
 
+os.makedirs(f"data/raw/Companies/{companyCode}", exist_ok=True)
 def get_quarter_range(date: pd.Timestamp):
+
     # 분기 시작/종료일 구하기
     quarter = (date.month - 1) // 3 + 1
     year = date.year
@@ -21,7 +23,7 @@ def get_quarter_range(date: pd.Timestamp):
         end = pd.Timestamp(f"{year}-12-31")
     return start, end
 
-def fetch_quarterly_financials_merged(ticker: str, save_dir: str = f"data/raw/{companyCode}"):
+def fetch_quarterly_financials_merged(ticker: str, save_dir: str = f"data/raw/Companies/{companyCode}"):
     os.makedirs(save_dir, exist_ok=True)
     
     stock = yf.Ticker(ticker)
@@ -36,12 +38,12 @@ def fetch_quarterly_financials_merged(ticker: str, save_dir: str = f"data/raw/{c
         start_date, end_date = get_quarter_range(report_date)
 
         record = {
-            "Revenue": income_stmt.loc[report_date].get("Total Revenue"),
-            "NetIncome": income_stmt.loc[report_date].get("Net Income"),
-            "TotalAssets": balance_sheet.loc[report_date].get("Total Assets"),
-            "TotalLiabilities": balance_sheet.loc[report_date].get("Total Liab"),
-            "OperatingCashFlow": cashflow_stmt.loc[report_date].get("Total Cash From Operating Activities"),
-            "CapitalExpenditures": cashflow_stmt.loc[report_date].get("Capital Expenditures")
+            "Revenue": income_stmt.loc[report_date].get("Total Revenue") if report_date in income_stmt.index else None,
+            "NetIncome": income_stmt.loc[report_date].get("Net Income") if report_date in income_stmt.index else None,
+            "TotalAssets": balance_sheet.loc[report_date].get("Total Assets") if report_date in balance_sheet.index else None,
+            "TotalLiabilities": balance_sheet.loc[report_date].get("Total Liab") if report_date in balance_sheet.index else None,
+            "OperatingCashFlow": cashflow_stmt.loc[report_date].get("Total Cash From Operating Activities") if report_date in cashflow_stmt.index else None,
+            "CapitalExpenditures": cashflow_stmt.loc[report_date].get("Capital Expenditures") if report_date in cashflow_stmt.index else None
         }
 
         # 해당 분기의 각 날짜에 같은 데이터를 복제

@@ -1,1 +1,1 @@
-companyCode = "AAPL"
+companyCode = "META"

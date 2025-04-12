@@ -23,9 +23,6 @@ def create_sequences(data, sequence_length):
 def train_lstm_model(df: pd.DataFrame, sequence_length=200):
     df = df[["stock_close", "rate_close", "nasdaq_close", "target", "Revenue", "NetIncome", "TotalAssets"]].dropna()
 
-    feature_cols = ["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets"]
-    target_col = "target"
-
     # 정규화
     scaler_stock = MinMaxScaler()
     scaler_rate = MinMaxScaler()
