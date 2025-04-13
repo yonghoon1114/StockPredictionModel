@@ -4,7 +4,7 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
-from config import companyCode, sequenceLength
+from config import companyCode, sequenceLength, data_columns, dataNumber
 
 
 def load_lstm_model(model_path: str):
@@ -21,12 +21,14 @@ def load_data_for_prediction(
     scaler_Revenue: MinMaxScaler,
     scaler_NetIncome: MinMaxScaler,
     scaler_TotalAssets: MinMaxScaler,
+    scaler_RSI: MinMaxScaler
+
 ) -> np.ndarray:
     df = pd.read_csv(path, parse_dates=["Date"])
     df = df.sort_values("Date")
 
     # 가장 최근 시퀀스 추출
-    recent_seq = df[["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets"]].iloc[-sequenceLength:]
+    recent_seq = df[data_columns].iloc[-sequenceLength:]
 
     # 각 feature별로 scaler를 이용해 변환
     scaled_stock = scaler_stock.transform(recent_seq[["stock_close"]])
@@ -35,6 +37,7 @@ def load_data_for_prediction(
     scaled_Revenue = scaler_Revenue.transform(recent_seq[["Revenue"]])
     scaled_NetIncome = scaler_NetIncome.transform(recent_seq[["NetIncome"]])
     scaled_TotalAssets = scaler_TotalAssets.transform(recent_seq[["TotalAssets"]])
+    scaled_RSI = scaler_RSI.transform(recent_seq[["RSI"]])
 
     # scaled_features를 합침
     scaled_features = np.hstack((
@@ -43,20 +46,21 @@ def load_data_for_prediction(
         scaled_nasdaq,
         scaled_Revenue,
         scaled_NetIncome,
-        scaled_TotalAssets
+        scaled_TotalAssets,
+        scaled_RSI
     ))
 
     # LSTM 입력 형태: (samples, time steps, features)
-    return scaled_features.reshape(1, sequenceLength, 6)
+    return scaled_features.reshape(1, sequenceLength, dataNumber)
 
 def predict_future_days(
     model, df, scalers, days=30
 ):
-    scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets = scalers
+    scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets,scaler_RSI = scalers
 
     df_sorted = df.sort_values("Date").copy()
 
-    recent_seq = df_sorted[["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets"]].iloc[-sequenceLength:]
+    recent_seq = df_sorted[data_columns].iloc[-sequenceLength:]
 
     predictions = []
 
@@ -68,9 +72,10 @@ def predict_future_days(
         scaled_Revenue = scaler_Revenue.transform(recent_seq[["Revenue"]])
         scaled_NetIncome = scaler_NetIncome.transform(recent_seq[["NetIncome"]])
         scaled_TotalAssets = scaler_TotalAssets.transform(recent_seq[["TotalAssets"]])
+        scaled_RSI = scaler_RSI.transform(recent_seq[["RSI"]])
 
-        X = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq, scaled_Revenue, scaled_NetIncome, scaled_TotalAssets))
-        X_input = X.reshape(1, sequenceLength, 6)
+        X = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq, scaled_Revenue, scaled_NetIncome, scaled_TotalAssets, scaled_RSI))
+        X_input = X.reshape(1, sequenceLength, dataNumber)
 
         pred_scaled = model.predict(X_input)[0][0]
         pred_price = scaler_stock.inverse_transform([[pred_scaled]])[0][0]
@@ -96,6 +101,7 @@ if __name__ == "__main__":
     scaler_Revenue = load_scaler(os.path.join(scaler_dir, f"scaler_Revenue_{companyCode}.joblib"))
     scaler_NetIncome = load_scaler(os.path.join(scaler_dir, f"scaler_NetIncome_{companyCode}.joblib"))
     scaler_TotalAssets = load_scaler(os.path.join(scaler_dir, f"scaler_TotalAssets_{companyCode}.joblib"))
+    scaler_RSI = load_scaler(os.path.join(scaler_dir, f"scaler_RSI_{companyCode}.joblib"))
 
     # 모델 로드
     model = load_lstm_model(model_path)
@@ -109,6 +115,7 @@ if __name__ == "__main__":
         scaler_Revenue,
         scaler_NetIncome,
         scaler_TotalAssets,
+        scaler_RSI
     )
 
     # 예측
@@ -123,7 +130,7 @@ if __name__ == "__main__":
 
     predictions = predict_future_days(
         model, df,
-        scalers=[scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets],
+        scalers=[scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets, scaler_RSI],
         days=50
     )
 

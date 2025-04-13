@@ -7,7 +7,7 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import joblib
-from config import companyCode, sequenceLength
+from config import companyCode, sequenceLength, data_columns, dataNumber
 
 def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["Date"], index_col="Date")
@@ -20,8 +20,9 @@ def create_sequences(data, sequenceLength):
         y.append(data[i + sequenceLength, 0])  # 예측할 대상은 stock_close (0번째 열)
     return np.array(X), np.array(y)
 
+
 def train_lstm_model(df: pd.DataFrame):
-    df = df[["stock_close", "rate_close", "nasdaq_close", "target", "Revenue", "NetIncome", "TotalAssets"]].dropna()
+    df = df[data_columns].dropna()
 
     # 정규화
     scaler_stock = MinMaxScaler()
@@ -30,6 +31,7 @@ def train_lstm_model(df: pd.DataFrame):
     scaler_Revenue = MinMaxScaler()
     scaler_NetIncome = MinMaxScaler()
     scaler_TotalAssets = MinMaxScaler()
+    scaler_RSI = MinMaxScaler()
 
     scaled_stock = scaler_stock.fit_transform(df[["stock_close"]])
     scaled_rate = scaler_rate.fit_transform(df[["rate_close"]])
@@ -37,9 +39,10 @@ def train_lstm_model(df: pd.DataFrame):
     scaled_Revenue = scaler_Revenue.fit_transform(df[["Revenue"]])
     scaled_NetIncome = scaler_NetIncome.fit_transform(df[["NetIncome"]])
     scaled_totalAssets = scaler_TotalAssets.fit_transform(df[["TotalAssets"]])
+    scaled_RSI = scaler_RSI.fit_transform(df[["RSI"]])
 
     # 시퀀스 생성
-    scaled_features = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq,scaled_Revenue, scaled_NetIncome,scaled_totalAssets))
+    scaled_features = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq,scaled_Revenue, scaled_NetIncome,scaled_totalAssets, scaled_RSI))
     X, y = create_sequences(scaled_features, sequenceLength)
 
     # 학습/테스트 분할
@@ -54,7 +57,7 @@ def train_lstm_model(df: pd.DataFrame):
     # 모델 정의
     # 모델 정의 시 input_shape 수정
     model = Sequential([
-        LSTM(50, activation='relu', input_shape=(sequenceLength, 6)),
+        LSTM(50, activation='relu', input_shape=(sequenceLength, dataNumber)),
         Dense(1)
     ])  
     model.compile(optimizer='adam', loss='mse')
@@ -74,6 +77,8 @@ def train_lstm_model(df: pd.DataFrame):
     joblib.dump(scaler_TotalAssets,f"models/scalers/scaler_TotalAssets_{companyCode}.joblib")
     joblib.dump(scaler_Revenue,f"models/scalers/scaler_Revenue_{companyCode}.joblib")
     joblib.dump(scaler_NetIncome,f"models/scalers/scaler_NetIncome_{companyCode}.joblib")
+    joblib.dump(scaler_RSI,f"models/scalers/scaler_RSI_{companyCode}.joblib")
+
     return model
 
 if __name__ == "__main__":

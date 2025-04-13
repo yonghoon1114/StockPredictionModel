@@ -1,2 +1,4 @@
-companyCode = "PLTR"
-sequenceLength = 30
+companyCode = "AAPL"
+sequenceLength = 40
+data_columns = ["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets", "RSI"]
+dataNumber = 7
