@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from config import companyCode
+from config import companyCode, Date
 
 def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
     delta = series.diff()
@@ -51,9 +51,9 @@ def load_and_merge_data(stock_path: str, rate_path: str, nasdaq_path: str, finan
     return df
 
 if __name__ == "__main__":
-    stock_file = os.path.join("data", "raw","Companies", f"{companyCode}", f"{companyCode}_1910-01-01_2026-04-11.csv")
-    rate_file = os.path.join("data", "raw", "INTEREST", "IRX_1910-01-01_2026-04-11.csv")
-    nasdaq_file = os.path.join("data", "raw", "NASDAQ", "IXIC_1910-01-01_2026-04-11.csv")
+    stock_file = os.path.join("data", "raw","Companies", f"{companyCode}", f"{companyCode}_1910-01-01_{Date}.csv")
+    rate_file = os.path.join("data", "raw", "INTEREST", f"IRX_1910-01-01_{Date}.csv")
+    nasdaq_file = os.path.join("data", "raw", "NASDAQ", f"IXIC_1910-01-01_{Date}.csv")
     financial_file = os.path.join("data", "raw","Companies", f"{companyCode}", f"{companyCode}_quarterly_financials_expanded.csv")
     
     merged_df = load_and_merge_data(stock_file, rate_file, nasdaq_file, financial_file)

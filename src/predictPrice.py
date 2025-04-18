@@ -4,7 +4,7 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
-from config import companyCode, sequenceLength, data_columns, dataNumber
+from config import companyCode, sequenceLength, data_columns, dataNumber, Date
 
 
 def load_lstm_model(model_path: str):

@@ -1,7 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import os
-from config import companyCode
+from config import companyCode, Date
 
 os.makedirs(f"data/raw/Companies/{companyCode}", exist_ok=True)
 def get_quarter_range(date: pd.Timestamp):
@@ -76,4 +76,4 @@ def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = f"data/
 
 if __name__ == "__main__":
     fetch_quarterly_financials_merged(f"{companyCode}")
-    fetch_stock_data(f"{companyCode}", "1910-01-01", "2026-04-11")
+    fetch_stock_data(f"{companyCode}", "1910-01-01", Date)

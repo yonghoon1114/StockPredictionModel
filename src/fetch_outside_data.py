@@ -1,7 +1,8 @@
 import yfinance as yf
 import os
+from config import Date
 
-def fetch_interest_rate_data(ticker="^IRX", start="1910-01-01", end="2026-04-11", save_path="data/raw/INTEREST"):
+def fetch_interest_rate_data(ticker="^IRX", start="1910-01-01", end=Date, save_path="data/raw/INTEREST"):
     # yfinance로 금리 데이터 다운로드
     data = yf.download(ticker, start=start, end=end)
 
@@ -16,7 +17,7 @@ def fetch_interest_rate_data(ticker="^IRX", start="1910-01-01", end="2026-04-11"
     print(f"Saved: {file_path}")
     return data
 
-def fetch_nasdaq_index_data(ticker="^IXIC", start="1910-01-01", end="2026-04-11", save_path="data/raw/NASDAQ"):
+def fetch_nasdaq_index_data(ticker="^IXIC", start="1910-01-01", end=Date, save_path="data/raw/NASDAQ"):
     # yfinance로 NASDAQ Composite Index 데이터 다운로드
     data = yf.download(ticker, start=start, end=end)
 
