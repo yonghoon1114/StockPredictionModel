@@ -21,7 +21,8 @@ def load_data_for_prediction(
     scaler_Revenue: MinMaxScaler,
     scaler_NetIncome: MinMaxScaler,
     scaler_TotalAssets: MinMaxScaler,
-    scaler_RSI: MinMaxScaler
+    scaler_RSI: MinMaxScaler,
+    scaler_gold:MinMaxScaler
 
 ) -> np.ndarray:
     df = pd.read_csv(path, parse_dates=["Date"])
@@ -38,6 +39,7 @@ def load_data_for_prediction(
     scaled_NetIncome = scaler_NetIncome.transform(recent_seq[["NetIncome"]])
     scaled_TotalAssets = scaler_TotalAssets.transform(recent_seq[["TotalAssets"]])
     scaled_RSI = scaler_RSI.transform(recent_seq[["RSI"]])
+    scaled_gold = scaler_gold.transform(recent_seq[["gold_close"]])
 
     # scaled_features를 합침
     scaled_features = np.hstack((
@@ -47,7 +49,8 @@ def load_data_for_prediction(
         scaled_Revenue,
         scaled_NetIncome,
         scaled_TotalAssets,
-        scaled_RSI
+        scaled_RSI,
+        scaled_gold
     ))
 
     # LSTM 입력 형태: (samples, time steps, features)
@@ -56,7 +59,7 @@ def load_data_for_prediction(
 def predict_future_days(
     model, df, scalers, days=30
 ):
-    scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets,scaler_RSI = scalers
+    scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets, scaler_RSI, scaler_gold = scalers
 
     df_sorted = df.sort_values("Date").copy()
 
@@ -73,8 +76,9 @@ def predict_future_days(
         scaled_NetIncome = scaler_NetIncome.transform(recent_seq[["NetIncome"]])
         scaled_TotalAssets = scaler_TotalAssets.transform(recent_seq[["TotalAssets"]])
         scaled_RSI = scaler_RSI.transform(recent_seq[["RSI"]])
+        scaled_gold = scaler_gold.transform(recent_seq[["gold_close"]])
 
-        X = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq, scaled_Revenue, scaled_NetIncome, scaled_TotalAssets, scaled_RSI))
+        X = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq, scaled_Revenue, scaled_NetIncome, scaled_TotalAssets, scaled_RSI, scaled_gold))
         X_input = X.reshape(1, sequenceLength, dataNumber)
 
         pred_scaled = model.predict(X_input)[0][0]
@@ -92,7 +96,7 @@ def predict_future_days(
 if __name__ == "__main__":
     model_path = os.path.join("models", f"lstm_model_for_{companyCode}.h5")
     scaler_dir = os.path.join("models", "scalers")
-    data_path = os.path.join("data", "processed", f"{companyCode}_merged.csv")
+    data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
 
     # 스케일러 로드
     scaler_stock = load_scaler(os.path.join(scaler_dir, f"scaler_stock_{companyCode}.joblib"))
@@ -102,6 +106,7 @@ if __name__ == "__main__":
     scaler_NetIncome = load_scaler(os.path.join(scaler_dir, f"scaler_NetIncome_{companyCode}.joblib"))
     scaler_TotalAssets = load_scaler(os.path.join(scaler_dir, f"scaler_TotalAssets_{companyCode}.joblib"))
     scaler_RSI = load_scaler(os.path.join(scaler_dir, f"scaler_RSI_{companyCode}.joblib"))
+    scaler_gold = load_scaler(os.path.join(scaler_dir, f"scaler_Gold.joblib"))
 
     # 모델 로드
     model = load_lstm_model(model_path)
@@ -115,7 +120,8 @@ if __name__ == "__main__":
         scaler_Revenue,
         scaler_NetIncome,
         scaler_TotalAssets,
-        scaler_RSI
+        scaler_RSI,
+        scaler_gold
     )
 
     # 예측
@@ -130,7 +136,7 @@ if __name__ == "__main__":
 
     predictions = predict_future_days(
         model, df,
-        scalers=[scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets, scaler_RSI],
+        scalers=[scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets, scaler_RSI, scaler_gold],
         days=50
     )
 

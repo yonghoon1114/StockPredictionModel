@@ -7,7 +7,7 @@ from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import joblib
-from config import companyCode, sequenceLength, data_columns, dataNumber
+from config import companyCode, sequenceLength, data_columns, dataNumber, Date
 
 def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["Date"], index_col="Date")
@@ -32,6 +32,7 @@ def train_lstm_model(df: pd.DataFrame):
     scaler_NetIncome = MinMaxScaler()
     scaler_TotalAssets = MinMaxScaler()
     scaler_RSI = MinMaxScaler()
+    scaler_Gold = MinMaxScaler()
 
     scaled_stock = scaler_stock.fit_transform(df[["stock_close"]])
     scaled_rate = scaler_rate.fit_transform(df[["rate_close"]])
@@ -40,9 +41,10 @@ def train_lstm_model(df: pd.DataFrame):
     scaled_NetIncome = scaler_NetIncome.fit_transform(df[["NetIncome"]])
     scaled_totalAssets = scaler_TotalAssets.fit_transform(df[["TotalAssets"]])
     scaled_RSI = scaler_RSI.fit_transform(df[["RSI"]])
+    scaled_gold = scaler_Gold.fit_transform(df[["gold_close"]])
 
     # 시퀀스 생성
-    scaled_features = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq,scaled_Revenue, scaled_NetIncome,scaled_totalAssets, scaled_RSI))
+    scaled_features = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq,scaled_Revenue, scaled_NetIncome,scaled_totalAssets, scaled_RSI, scaled_gold))
     X, y = create_sequences(scaled_features, sequenceLength)
 
     # 학습/테스트 분할
@@ -78,10 +80,11 @@ def train_lstm_model(df: pd.DataFrame):
     joblib.dump(scaler_Revenue,f"models/scalers/scaler_Revenue_{companyCode}.joblib")
     joblib.dump(scaler_NetIncome,f"models/scalers/scaler_NetIncome_{companyCode}.joblib")
     joblib.dump(scaler_RSI,f"models/scalers/scaler_RSI_{companyCode}.joblib")
+    joblib.dump(scaler_Gold, "models/scalers/scaler_Gold.joblib")
 
     return model
 
 if __name__ == "__main__":
-    data_path = os.path.join("data", "processed", f"{companyCode}_merged.csv")
+    data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
     df = load_data(data_path)
     trained_model = train_lstm_model(df)
