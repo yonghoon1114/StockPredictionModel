@@ -62,7 +62,7 @@ def predict_future_days(
 
     recent_seq = df_sorted[data_columns].iloc[-sequenceLength:]
 
-    predictions = []
+    # predictions = []
 
     for _ in range(days):
         # 스케일링
@@ -79,15 +79,15 @@ def predict_future_days(
 
         pred_scaled = model.predict(X_input)[0][0]
         pred_price = scaler_stock.inverse_transform([[pred_scaled]])[0][0]
-        predictions.append(pred_price)
+        # predictions.append(pred_price)
 
-        # 새로운 예측값을 가진 행 추가 (나머지 변수는 그대로 사용)
-        last_row = recent_seq.iloc[-1].copy()
-        new_row = last_row.copy()
-        new_row["stock_close"] = pred_price
-        recent_seq = pd.concat([recent_seq.iloc[1:], pd.DataFrame([new_row])], ignore_index=True)
+        # # 새로운 예측값을 가진 행 추가 (나머지 변수는 그대로 사용)
+        # last_row = recent_seq.iloc[-1].copy()
+        # new_row = last_row.copy()
+        # new_row["stock_close"] = pred_price
+        # recent_seq = pd.concat([recent_seq.iloc[1:], pd.DataFrame([new_row])], ignore_index=True)
 
-    return predictions
+    return pred_price
 
 if __name__ == "__main__":
     model_path = os.path.join("models", f"lstm_model_for_{companyCode}.h5")
@@ -137,4 +137,4 @@ if __name__ == "__main__":
     # for i, p in enumerate(predictions, 1):
     #     print(f"Day {i} predicted price: {p:.2f}")
     
-    print(f"Estimated value of stock of {companyCode} : {predictions[-1]:.2f}")
+    print(f"Estimated value of stock of {companyCode} : {predictions:.2f}")
