@@ -3,149 +3,91 @@ import os
 import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
-from sklearn.preprocessing import MinMaxScaler
 from config import companyCode, sequenceLength, data_columns, dataNumber, Date
+import matplotlib.pyplot as plt
 
+SCALER_KEYS = [
+    "stock", "rate", "nasdaq", "Revenue",
+    "NetIncome", "TotalAssets", "RSI", "Gold"
+]
 
-def load_lstm_model(model_path: str):
+def load_model_for_prediction(model_path: str):
     return load_model(model_path, compile=False)
 
-def load_scaler(scaler_path: str):
-    return joblib.load(scaler_path)
+def load_scalers(scaler_dir: str, company_code: str):
+    scalers = {}
+    for key in SCALER_KEYS:
+        fname = f"scaler_{key}_{company_code}.joblib" if key in ["stock", "Revenue", "NetIncome", "TotalAssets", "RSI"] else f"scaler_{key}.joblib"
+        path = os.path.join(scaler_dir, fname)
+        scalers[key] = joblib.load(path)
+    return scalers
 
-def load_data_for_prediction(
-    path: str,
-    scaler_stock: MinMaxScaler,
-    scaler_rate: MinMaxScaler,
-    scaler_nasdaq: MinMaxScaler,
-    scaler_Revenue: MinMaxScaler,
-    scaler_NetIncome: MinMaxScaler,
-    scaler_TotalAssets: MinMaxScaler,
-    scaler_RSI: MinMaxScaler,
-    scaler_gold:MinMaxScaler
-
-) -> np.ndarray:
-    df = pd.read_csv(path, parse_dates=["Date"])
-    df = df.sort_values("Date")
-
-    # 가장 최근 시퀀스 추출 (테스트용 제외)
+def preprocess_sequence(df, scalers):
     recent_seq = df[data_columns].iloc[-sequenceLength:]
-
-    # 각 feature별로 scaler를 이용해 변환
-    scaled_stock = scaler_stock.transform(recent_seq[["stock_close"]])
-    scaled_rate = scaler_rate.transform(recent_seq[["rate_close"]])
-    scaled_nasdaq = scaler_nasdaq.transform(recent_seq[["nasdaq_close"]])
-    scaled_Revenue = scaler_Revenue.transform(recent_seq[["Revenue"]])
-    scaled_NetIncome = scaler_NetIncome.transform(recent_seq[["NetIncome"]])
-    scaled_TotalAssets = scaler_TotalAssets.transform(recent_seq[["TotalAssets"]])
-    scaled_RSI = scaler_RSI.transform(recent_seq[["RSI"]])
-    scaled_gold = scaler_gold.transform(recent_seq[["gold_close"]])
-
-    # scaled_features를 합침
-    scaled_features = np.hstack((
-        scaled_stock,
-        scaled_rate,
-        scaled_nasdaq,
-        scaled_Revenue,
-        scaled_NetIncome,
-        scaled_TotalAssets,
-        scaled_RSI,
-        scaled_gold
-    ))
-
-    # LSTM 입력 형태: (samples, time steps, features)
+    scaled_features = np.hstack([
+        scalers["stock"].transform(recent_seq[["stock_close"]]),
+        scalers["rate"].transform(recent_seq[["rate_close"]]),
+        scalers["nasdaq"].transform(recent_seq[["nasdaq_close"]]),
+        scalers["Revenue"].transform(recent_seq[["Revenue"]]),
+        scalers["NetIncome"].transform(recent_seq[["NetIncome"]]),
+        scalers["TotalAssets"].transform(recent_seq[["TotalAssets"]]),
+        scalers["RSI"].transform(recent_seq[["RSI"]]),
+        scalers["Gold"].transform(recent_seq[["gold_close"]])
+    ])
     return scaled_features.reshape(1, sequenceLength, dataNumber)
 
-def predict_future_days(
-    model, df, scalers, days=30
-):
-    scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets, scaler_RSI, scaler_gold = scalers
-
-    df_sorted = df.sort_values("Date").copy()
-
-    recent_seq = df_sorted[data_columns].iloc[-sequenceLength:]
-
-    # predictions = []
+def predict_future_prices(model, df, scalers, days=30):
+    df = df.sort_values("Date").copy()
+    recent_seq = df[data_columns].iloc[-sequenceLength:].copy()
+    predictions = []
 
     for _ in range(days):
-        # 스케일링
-        scaled_stock = scaler_stock.transform(recent_seq[["stock_close"]])
-        scaled_rate = scaler_rate.transform(recent_seq[["rate_close"]])
-        scaled_nasdaq = scaler_nasdaq.transform(recent_seq[["nasdaq_close"]])
-        scaled_Revenue = scaler_Revenue.transform(recent_seq[["Revenue"]])
-        scaled_NetIncome = scaler_NetIncome.transform(recent_seq[["NetIncome"]])
-        scaled_TotalAssets = scaler_TotalAssets.transform(recent_seq[["TotalAssets"]])
-        scaled_RSI = scaler_RSI.transform(recent_seq[["RSI"]])
-        scaled_gold = scaler_gold.transform(recent_seq[["gold_close"]])
+        temp_df = pd.concat([df.iloc[-(sequenceLength + 1):-1], recent_seq.tail(1)], ignore_index=True)
+        X_input = preprocess_sequence(temp_df, scalers)
+        pred_scaled = model.predict(X_input, verbose=0)[0][0]
+        pred_price = scalers["stock"].inverse_transform([[pred_scaled]])[0][0]
+        predictions.append(pred_price)
 
-        X = np.hstack((scaled_stock, scaled_rate, scaled_nasdaq, scaled_Revenue, scaled_NetIncome, scaled_TotalAssets, scaled_RSI, scaled_gold))
-        X_input = X.reshape(1, sequenceLength, dataNumber)
+        new_row = recent_seq.iloc[-1].copy()
+        new_row["stock_close"] = pred_price
+        recent_seq = pd.concat([recent_seq.iloc[1:], pd.DataFrame([new_row])], ignore_index=True)
 
-        pred_scaled = model.predict(X_input)[0][0]
-        pred_price = scaler_stock.inverse_transform([[pred_scaled]])[0][0]
-        # predictions.append(pred_price)
+    return predictions
 
-        # # 새로운 예측값을 가진 행 추가 (나머지 변수는 그대로 사용)
-        # last_row = recent_seq.iloc[-1].copy()
-        # new_row = last_row.copy()
-        # new_row["stock_close"] = pred_price
-        # recent_seq = pd.concat([recent_seq.iloc[1:], pd.DataFrame([new_row])], ignore_index=True)
-
-    return pred_price
+# 예측 결과 시각화
+def plot_predictions(predictions, last_actual_price):
+    plt.figure(figsize=(12, 6))
+    plt.plot(range(1, len(predictions)+1), predictions, label="Predicted Price", marker='o')
+    plt.axhline(y=last_actual_price, color='r', linestyle='--', label=f"Last Actual Price: {last_actual_price:.2f}")
+    plt.title("Stock Price Prediction for Next 30 Days")
+    plt.xlabel("Days Ahead")
+    plt.ylabel("Price")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
-    model_path = os.path.join("models", f"lstm_model_for_{companyCode}.h5")
-    scaler_dir = os.path.join("models", "scalers")
+    base_dir = "models"
+    scaler_dir = os.path.join(base_dir, "scalers")
+    model_path = os.path.join(base_dir, f"lstm_model_for_{companyCode}.h5")
     data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
 
-    # 스케일러 로드
-    scaler_stock = load_scaler(os.path.join(scaler_dir, f"scaler_stock_{companyCode}.joblib"))
-    scaler_rate = load_scaler(os.path.join(scaler_dir, "scaler_rate.joblib"))
-    scaler_nasdaq = load_scaler(os.path.join(scaler_dir, "scaler_nasdaq.joblib"))
-    scaler_Revenue = load_scaler(os.path.join(scaler_dir, f"scaler_Revenue_{companyCode}.joblib"))
-    scaler_NetIncome = load_scaler(os.path.join(scaler_dir, f"scaler_NetIncome_{companyCode}.joblib"))
-    scaler_TotalAssets = load_scaler(os.path.join(scaler_dir, f"scaler_TotalAssets_{companyCode}.joblib"))
-    scaler_RSI = load_scaler(os.path.join(scaler_dir, f"scaler_RSI_{companyCode}.joblib"))
-    scaler_gold = load_scaler(os.path.join(scaler_dir, f"scaler_Gold.joblib"))
-
-    # 모델 로드
-    model = load_lstm_model(model_path)
-
-    # 예측용 데이터 준비
-    X_pred = load_data_for_prediction(
-        data_path,
-        scaler_stock,
-        scaler_rate,
-        scaler_nasdaq,
-        scaler_Revenue,
-        scaler_NetIncome,
-        scaler_TotalAssets,
-        scaler_RSI,
-        scaler_gold
-    )
-
-    # 예측
-    predicted_scaled = model.predict(X_pred)[0][0]
-
-    # 결과를 원래 가격대로 되돌림
-    predicted_price = scaler_stock.inverse_transform([[predicted_scaled]])[0][0]
-
-    # print(f"Predicted stock price: {predicted_price:.2f}")
-    
+    model = load_model_for_prediction(model_path)
+    scalers = load_scalers(scaler_dir, companyCode)
     df = pd.read_csv(data_path, parse_dates=["Date"])
 
-    predictions = predict_future_days(
-        model, df,
-        scalers=[scaler_stock, scaler_rate, scaler_nasdaq, scaler_Revenue, scaler_NetIncome, scaler_TotalAssets, scaler_RSI, scaler_gold],
-        days=50
-    )
+    # 예측 수행
+    predictions = predict_future_prices(model, df, scalers, days=30)
 
-    # for i, p in enumerate(predictions, 1):
-    #     print(f"Day {i} predicted price: {p:.2f}")
-    
-    print(f"Estimated value of stock of {companyCode} : {predictions:.2f}")
-    df= pd.read_csv(f"C:/Users/kimyo/StockPredictionModel/data/raw/Companies/{companyCode}/{companyCode}_1910-01-01_{Date}.csv")
-    last_price = round(float(df["Close"].iloc[-1]),2)
-    profit = (predictions - last_price)/last_price * 100
+    # 수익률 계산
+    last_price = round(float(df["stock_close"].iloc[-1]), 2)
+    final_predicted_price = predictions[-1]
+    profit = (final_predicted_price - last_price) / last_price * 100
+
+    print(f"Estimated value of stock of {companyCode} after 30 days: {final_predicted_price:.2f}")
     print(f"Current price : {last_price}")
     print(f"Profit: {profit:.2f}%")
+
+    # 그래프 출력
+    plot_predictions(predictions, last_price)
