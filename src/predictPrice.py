@@ -144,3 +144,8 @@ if __name__ == "__main__":
     #     print(f"Day {i} predicted price: {p:.2f}")
     
     print(f"Estimated value of stock of {companyCode} : {predictions:.2f}")
+    df= pd.read_csv(f"C:/Users/kimyo/StockPredictionModel/data/raw/Companies/{companyCode}/{companyCode}_1910-01-01_{Date}.csv")
+    last_price = round(float(df["Close"].iloc[-1]),2)
+    profit = (predictions - last_price)/last_price * 100
+    print(f"Current price : {last_price}")
+    print(f"Profit: {profit:.2f}%")
