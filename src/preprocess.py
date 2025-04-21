@@ -1,3 +1,5 @@
+# 이 파일은 앞에서 company data, macro data 가져온 거랑 RSI라고 과매도 지수 계산해서 하나 파일로 합치는 파일임 
+
 import pandas as pd
 import os
 from config import companyCode, Date
@@ -24,7 +26,7 @@ def load_and_merge_data(stock_path: str, rate_path: str, nasdaq_path: str, finan
             index_col="Date"
         )[[ "Close" ]].rename(columns={"Close": f"{col_prefix}_close"})
 
-    stock = read_file(stock_path, "stock")
+    stock = read_file(stock_path, "stock") # 주식, 금리 등등 데이터 파일 불러오기 
     rate = read_file(rate_path, "rate")
     nasdaq = read_file(nasdaq_path, "nasdaq")
     gold = read_file(gold_path, "gold")
@@ -37,10 +39,10 @@ def load_and_merge_data(stock_path: str, rate_path: str, nasdaq_path: str, finan
     financials = financials.set_index("Date")
 
 
-    # 세 개 데이터프레임 병합
+    # 데이터프레임 병합 주식, 나스닥, 금값
     df = stock.join(rate, how="inner").join(nasdaq, how="inner").join(gold, how="left")
 
-    # 재무 데이터 병합 (가장 가까운 날짜의 재무제표로 보간)
+    # 재무 데이터 병합 
     df = df.join(financials, how="left").ffill()
 
     

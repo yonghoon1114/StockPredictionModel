@@ -28,7 +28,7 @@ def load_data_for_prediction(
     df = pd.read_csv(path, parse_dates=["Date"])
     df = df.sort_values("Date")
 
-    # 가장 최근 시퀀스 추출
+    # 가장 최근 시퀀스 추출 (테스트용 제외)
     recent_seq = df[data_columns].iloc[-sequenceLength:]
 
     # 각 feature별로 scaler를 이용해 변환

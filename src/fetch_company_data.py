@@ -3,7 +3,9 @@ import pandas as pd
 import os
 from config import companyCode, Date
 
-os.makedirs(f"data/raw/Companies/{companyCode}", exist_ok=True)
+os.makedirs(f"data/raw/Companies/{companyCode}", exist_ok=True) # 회사 폴더 만들어서 보기 좋게
+
+# 이거 재무제표 분기별로 나누는 거임 
 def get_quarter_range(date: pd.Timestamp):
 
     # 분기 시작/종료일 구하기
@@ -23,6 +25,7 @@ def get_quarter_range(date: pd.Timestamp):
         end = pd.Timestamp(f"{year}-12-31")
     return start, end
 
+# 이거는 회사 재무제표 가져오는 코드임 API쓰는거라 나도 모름 잘 어떻게 한건지
 def fetch_quarterly_financials_merged(ticker: str, save_dir: str = f"data/raw/Companies/{companyCode}"):
     os.makedirs(save_dir, exist_ok=True)
     

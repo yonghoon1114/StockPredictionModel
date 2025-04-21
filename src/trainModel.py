@@ -13,6 +13,7 @@ def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["Date"], index_col="Date")
     return df
 
+# AI에 넣을 데이터 적절한 어레이 형태로 가공하기 
 def create_sequences(data, sequenceLength):
     X, y = [], []
     for i in range(len(data) - sequenceLength):
@@ -24,7 +25,7 @@ def create_sequences(data, sequenceLength):
 def train_lstm_model(df: pd.DataFrame):
     df = df[data_columns].dropna()
 
-    # 정규화
+    # 정규화 AI가 학습할 수 있는 적절한 숫자로 바꿔주기 위한 scaler
     scaler_stock = MinMaxScaler()
     scaler_rate = MinMaxScaler()
     scaler_nasdaq = MinMaxScaler()
@@ -52,11 +53,6 @@ def train_lstm_model(df: pd.DataFrame):
     X_train, X_test = X[:split], X[split:]
     y_train, y_test = y[:split], y[split:]
 
-    # LSTM 입력 형태: (samples, time steps, features)
-    # X_train = X_train[:, :, :3]
-    # X_test = X_test[:, :, :3]
-
-    # 모델 정의
     # 모델 정의 시 input_shape 수정
     model = Sequential([
         LSTM(50, activation='relu', input_shape=(sequenceLength, dataNumber)),
