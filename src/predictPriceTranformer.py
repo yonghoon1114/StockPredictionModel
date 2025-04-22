@@ -98,5 +98,6 @@ if __name__ == "__main__":
     profit = (predictions[-1] - last_price) / last_price * 100
     print(f"Current price: {last_price:.2f}")
     print(f"Profit on predicted price after 30 days: {profit:.2f}%")
+    
     # 마지막 부분에 추가
     plot_predictions(predictions, last_price)   

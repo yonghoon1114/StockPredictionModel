@@ -25,6 +25,18 @@ def get_quarter_range(date: pd.Timestamp):
         end = pd.Timestamp(f"{year}-12-31")
     return start, end
 
+def get_12_months_eps(ticker_symbol: str):
+    # 티커 객체 생성
+    ticker = yf.Ticker(ticker_symbol)
+    
+    # 12개월 EPS 값을 가져오기
+    eps_12_months = ticker.info.get("epsTrailingTwelveMonths")
+    
+    if eps_12_months is not None:
+        return eps_12_months
+    else:
+        return "EPS data not available"
+
 # 이거는 회사 재무제표 가져오는 코드임 API쓰는거라 나도 모름 잘 어떻게 한건지
 def fetch_quarterly_financials_merged(ticker: str, save_dir: str = f"data/raw/Companies/{companyCode}"):
     os.makedirs(save_dir, exist_ok=True)
@@ -80,3 +92,4 @@ def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = f"data/
 if __name__ == "__main__":
     fetch_quarterly_financials_merged(f"{companyCode}")
     fetch_stock_data(f"{companyCode}", "1910-01-01", Date)
+    

@@ -51,6 +51,7 @@ def load_and_merge_data(stock_path: str, rate_path: str, nasdaq_path: str, finan
 
     # NaN 제거 (RSI, target 없는 행들 제거)
     df = df.dropna(subset=["RSI", "target"])
+    df = df[(df['RSI'] > 30) & (df['RSI'] < 70)]
 
     return df
 

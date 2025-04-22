@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
-from config import companyCode
+from config import companyCode, Date
 
 # 데이터 로딩 함수
 def load_data(path: str) -> pd.DataFrame:
@@ -33,7 +33,7 @@ def plot_nasdaq_and_interest_rate(df: pd.DataFrame):
 
 # 메인 실행 부분
 if __name__ == "__main__":
-    data_path = os.path.join("data", "processed", f"{companyCode}_merged.csv")
+    data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
 
     # 데이터 로드
     df = load_data(data_path)
