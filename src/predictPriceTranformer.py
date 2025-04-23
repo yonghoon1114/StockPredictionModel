@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
@@ -29,7 +30,7 @@ def load_data_for_prediction(
     return scaled_features.reshape(1, sequenceLength, dataNumber)
 
 def predict_future_days(
-    model, df, scalers, days=30
+    model, df, scalers, days=50
 ):
     df_sorted = df.sort_values("Date").copy()
     recent_seq = df_sorted[data_columns].iloc[-sequenceLength:]
@@ -56,7 +57,6 @@ def predict_future_days(
         recent_seq = pd.concat([recent_seq.iloc[1:], pd.DataFrame([new_row])], ignore_index=True)
 
     return predictions
-import matplotlib.pyplot as plt
 
 # 예측 결과 시각화
 def plot_predictions(predictions, last_actual_price):
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     last_price = pd.read_csv(data_path)["stock_close"].iloc[-1]
     profit = (predictions[-1] - last_price) / last_price * 100
     print(f"Current price: {last_price:.2f}")
-    print(f"Profit on predicted price after 30 days: {profit:.2f}%")
+    print(f"Profit on predicted price after 50 days: {profit:.2f}%")
     
     # 마지막 부분에 추가
     plot_predictions(predictions, last_price)   

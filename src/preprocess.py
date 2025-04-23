@@ -1,5 +1,3 @@
-# 이 파일은 앞에서 company data, macro data 가져온 거랑 RSI라고 과매도 지수 계산해서 하나 파일로 합치는 파일임 
-
 import pandas as pd
 import os
 from config import companyCode, Date
@@ -8,61 +6,69 @@ def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
     delta = series.diff()
     gain = delta.clip(lower=0)
     loss = -delta.clip(upper=0)
-
     avg_gain = gain.rolling(window=period).mean()
     avg_loss = loss.rolling(window=period).mean()
-
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
-def load_and_merge_data(stock_path: str, rate_path: str, nasdaq_path: str, financial_path: str, gold_path: str) -> pd.DataFrame:
-    def read_file(path: str, col_prefix: str) -> pd.DataFrame:
-        return pd.read_csv(
-            path,
-            header=2,
-            names=["Date", "Close", "High", "Low", "Open", "Volume"],
-            parse_dates=["Date"],
-            index_col="Date"
-        )[[ "Close" ]].rename(columns={"Close": f"{col_prefix}_close"})
+def calculate_relative(stock_close: pd.Series, semi_close: pd.Series) -> pd.Series:
+    return stock_close / semi_close
 
-    stock = read_file(stock_path, "stock") # 주식, 금리 등등 데이터 파일 불러오기 
-    rate = read_file(rate_path, "rate")
-    nasdaq = read_file(nasdaq_path, "nasdaq")
-    gold = read_file(gold_path, "gold")
+def read_file(path: str, col_prefix: str) -> pd.DataFrame:
+    df = pd.read_csv(
+        path,
+        header=2,
+        names=["Date", "Close", "High", "Low", "Open", "Volume"],
+        parse_dates=["Date"],
+        index_col="Date"
+    )
+    return df[["Close"]].rename(columns={"Close": f"{col_prefix}_close"})
 
-    # RSI 계산 후 열 추가
-    stock["RSI"] = calculate_rsi(stock["stock_close"])
-
-    # 재무 데이터 로드
-    financials = pd.read_csv(financial_path, parse_dates=["Date"])
-    financials = financials.set_index("Date")
-
-
-    # 데이터프레임 병합 주식, 나스닥, 금값
-    df = stock.join(rate, how="inner").join(nasdaq, how="inner").join(gold, how="left")
-
-    # 재무 데이터 병합 
-    df = df.join(financials, how="left").ffill()
-
+def preprocess(stock_df: pd.DataFrame) -> pd.DataFrame:
+    stock_df["RSI"] = calculate_rsi(stock_df["stock_close"])
+    stock_df["relative"] = calculate_relative(stock_df["stock_close"], stock_df["semiCond_close"])
+    stock_df["target"] = stock_df["stock_close"].shift(-1)
+    stock_df = stock_df.dropna(subset=["RSI", "target"])
+    # stock_df = stock_df[(stock_df["RSI"] > 30) & (stock_df["RSI"] < 70)]
     
-    # 타겟값 생성 (다음 날 주가)
-    df["target"] = df["stock_close"].shift(-1)
+    # 이벤트 마커 추가
+    election_dates = ['2020-11-03', '2024-11-05']  # 대선 날짜 설정
+    stock_df['election_marker'] = stock_df.index.isin(pd.to_datetime(election_dates))
+    
+    return stock_df
 
-    # NaN 제거 (RSI, target 없는 행들 제거)
-    df = df.dropna(subset=["RSI", "target"])
-    df = df[(df['RSI'] > 30) & (df['RSI'] < 70)]
+def load_and_merge_data(paths: dict, financial_path: str) -> pd.DataFrame:
+    dfs = {prefix: read_file(path, prefix) for prefix, path in paths.items()}
 
-    return df
+    # stock과 semicond는 먼저 결합한 후 전처리
+    stock = dfs["stock"].join(dfs["semiCond"], how="left")
+    stock = preprocess(stock)
+
+    # 기타 macro data 병합
+    macro_keys = ["rate", "nasdaq", "gold"]
+    for key in macro_keys:
+        stock = stock.join(dfs[key], how="inner" if key != "gold" else "left")
+
+    # 재무 데이터
+    financials = pd.read_csv(financial_path, parse_dates=["Date"]).set_index("Date")
+    full_df = stock.join(financials, how="left").ffill()
+
+    return full_df
 
 if __name__ == "__main__":
-    stock_file = os.path.join("data", "raw","Companies", f"{companyCode}", f"{companyCode}_1910-01-01_{Date}.csv")
-    rate_file = os.path.join("data", "raw", "INTEREST", f"IRX_1910-01-01_{Date}.csv")
-    gold_file = os.path.join("data", "raw", "GOLD", f"GCF_2000-01-01_{Date}.csv")
-    nasdaq_file = os.path.join("data", "raw", "NASDAQ", f"IXIC_1910-01-01_{Date}.csv")
-    financial_file = os.path.join("data", "raw","Companies", f"{companyCode}", f"{companyCode}_quarterly_financials_expanded.csv")
-    
-    merged_df = load_and_merge_data(stock_file, rate_file, nasdaq_file, financial_file, gold_file)
+    data_root = "data/raw"
+    company_path = os.path.join(data_root, "Companies", companyCode)
+    paths = {
+        "stock": os.path.join(company_path, f"{companyCode}_1910-01-01_{Date}.csv"),
+        "rate": os.path.join(data_root, "INTEREST", f"IRX_1910-01-01_{Date}.csv"),
+        "nasdaq": os.path.join(data_root, "NASDAQ", f"IXIC_1910-01-01_{Date}.csv"),
+        "gold": os.path.join(data_root, "GOLD", f"GCF_2000-01-01_{Date}.csv"),
+        "semiCond": os.path.join(data_root, "SEMICOND", f"SOX_1910-01-01_{Date}.csv"),
+    }
+    financial_file = os.path.join(company_path, f"{companyCode}_quarterly_financials_expanded.csv")
+
+    merged_df = load_and_merge_data(paths, financial_file)
     save_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     merged_df.to_csv(save_path)

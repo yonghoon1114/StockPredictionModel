@@ -16,7 +16,7 @@ def plot_nasdaq_and_interest_rate(df: pd.DataFrame):
     # 금리 (Interest Rate) 그래프
     ax1.set_xlabel('Date')
     ax1.set_ylabel('Interest Rate (%)', color='tab:red')
-    ax1.plot(df['Date'], df['rate_close'], color='tab:red', label='Interest Rate')
+    ax1.plot(df['Date'], df['rate_close'], color='tab:red', label='Stock Rate')
     ax1.tick_params(axis='y', labelcolor='tab:red')
 
     # 나스닥 (NASDAQ Index) 그래프
