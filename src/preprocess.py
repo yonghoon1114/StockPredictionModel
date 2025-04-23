@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 from config import companyCode, Date
+from itertools import chain
+
 
 def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
     delta = series.diff()
@@ -29,14 +31,19 @@ def preprocess(stock_df: pd.DataFrame) -> pd.DataFrame:
     stock_df["RSI"] = calculate_rsi(stock_df["stock_close"])
     stock_df["relative"] = calculate_relative(stock_df["stock_close"], stock_df["semiCond_close"])
     stock_df["target"] = stock_df["stock_close"].shift(-1)
-    stock_df = stock_df.dropna(subset=["RSI", "target"])
-    # stock_df = stock_df[(stock_df["RSI"] > 30) & (stock_df["RSI"] < 70)]
-    
-    # 이벤트 마커 추가
-    election_dates = ['2020-11-03', '2024-11-05']  # 대선 날짜 설정
-    stock_df['election_marker'] = stock_df.index.isin(pd.to_datetime(election_dates))
-    
-    return stock_df
+
+    # 이벤트 마커: 대선일 ±30일
+    election_dates = ["2020-11-03", "2024-11-05"]
+    election_ranges = [
+        pd.date_range(start=pd.to_datetime(day) - pd.DateOffset(days=30), end=pd.to_datetime(day) + pd.DateOffset(days=30))
+        for day in election_dates
+    ]
+    # 날짜 리스트 펼쳐서 중복 제거 후 인덱스로 만들기
+    extended_election_days = pd.DatetimeIndex(sorted(set(chain.from_iterable(election_ranges))))
+    stock_df["election_marker"] = stock_df.index.isin(extended_election_days)
+
+    return stock_df.dropna(subset=["RSI", "target"])
+
 
 def load_and_merge_data(paths: dict, financial_path: str) -> pd.DataFrame:
     dfs = {prefix: read_file(path, prefix) for prefix, path in paths.items()}
