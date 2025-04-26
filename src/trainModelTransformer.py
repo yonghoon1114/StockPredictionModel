@@ -63,13 +63,13 @@ def train_transformer_model(df: pd.DataFrame):
     print(f"Mean Squared Error: {mse:.4f}")
 
     os.makedirs("models/scalers", exist_ok=True)
-    model.save(os.path.join("models", f"transformer_model_for_{companyCode}.h5"))
+    model.save(os.path.join("models", f"transformer_model_for_{companyCode}_elaborated.h5"))
     for col in data_columns:
-        joblib.dump(scalers[col], f"models/scalers/scaler_transformer_{col}_{companyCode}.joblib")
+        joblib.dump(scalers[col], f"models/scalers/elaborated_scaler_transformer_{col}_{companyCode}.joblib")
 
     return model
 
 if __name__ == "__main__":
-    data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
+    data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_elaborated_merged.csv")
     df = load_data(data_path)
     trained_model = train_transformer_model(df)

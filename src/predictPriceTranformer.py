@@ -74,15 +74,15 @@ def plot_predictions(predictions, last_actual_price):
 
 
 if __name__ == "__main__":
-    model_path = os.path.join("models", f"transformer_model_for_{companyCode}.h5")
+    model_path = os.path.join("models", f"transformer_model_for_{companyCode}_elaborated.h5")
     scaler_dir = os.path.join("models", "scalers")
-    data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
+    data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_elaborated_merged.csv")
 
     # 모델 로드
     model = load_transformer_model(model_path)
 
     # 스케일러 로드
-    scalers = {col: load_scaler(os.path.join(scaler_dir, f"scaler_transformer_{col}_{companyCode}.joblib")) for col in data_columns}
+    scalers = {col: load_scaler(os.path.join(scaler_dir, f"elaborated_scaler_transformer_{col}_{companyCode}.joblib")) for col in data_columns}
 
     # 예측용 데이터 준비
     X_pred = load_data_for_prediction(data_path, scalers)

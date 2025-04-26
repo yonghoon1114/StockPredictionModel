@@ -14,8 +14,8 @@ def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
     rsi = 100 - (100 / (1 + rs))
     return rsi
 
-def calculate_relative(stock_close: pd.Series, semi_close: pd.Series) -> pd.Series:
-    return stock_close / semi_close
+def calculate_relative(stock_close: pd.Series, index: pd.Series) -> pd.Series:
+    return stock_close / index
 
 def read_file(path: str, col_prefix: str) -> pd.DataFrame:
     df = pd.read_csv(
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     financial_file = os.path.join(company_path, f"{companyCode}_quarterly_financials_expanded.csv")
 
     merged_df = load_and_merge_data(paths, financial_file)
-    save_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
+    save_path = os.path.join("data", "processed", f"{companyCode}_{Date}_elaborated_merged.csv")
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     merged_df.to_csv(save_path)
     print(f"Merged data saved to {save_path}")
