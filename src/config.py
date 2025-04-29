@@ -2,11 +2,11 @@
 import yfinance as yf
 from collections import defaultdict
 
-companyCode = "AAPL"  
+companyCode = "NVDA"  
 sequenceLength = 40 # 테스트 용 데이터 개수
 Date = "2026-01-01"
-# data_columns = ["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets", "RSI", "gold_close", "semiCond_close","election_marker"] #데이터 종류
-data_columns = ["stock_close","nasdaq_close","RSI","relative","target","election_marker","rate_close","gold_close","Revenue","NetIncome","TotalAssets"]
+data_columns = ["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets", "RSI", "gold_close", "semiCond_close","election_marker","relative"] #데이터 종류
+# data_columns = ["stock_close","nasdaq_close","RSI","relative","target","election_marker","rate_close","gold_close","Revenue","NetIncome","TotalAssets"]
 
 # data_columns = ["stock_close","nasdaq_close","RSI","relative","target",
 #                "election_marker","rate_close","gold_close","fin_Revenue","fin_NetIncome","fin_TotalAssets","fin_TotalLiabilities","fin_OperatingCashFlow",
@@ -70,8 +70,8 @@ for sector, companies in sector_group.items():
     sector_arrays[sector_name] = companies
 
 # 예시: Technology 섹터만 출력해보기
-# for company in sector_arrays.get('Technology', []):
-    # print(f"{company['Ticker']} - {company['Name']} (Market Cap: {company['Market Cap']})")
+for company in sector_arrays.get('Technology', []):
+    print(f"{company['Ticker']} - {company['Name']} (Market Cap: {company['Market Cap']})")
 
 # print(sp500_top100)
 

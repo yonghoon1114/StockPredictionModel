@@ -31,10 +31,12 @@ def fetch_gold_price_data():
 def fetch_semiCondocter_data():
     return fetch_data(ticker="^SOX", start ="1910-01-01", end=Date, prefix="SEMICOND")
 
-
+def fetch_entertainment():
+    return fetch_data(ticker= "XLC", start="2000-01-01", end=Date, prefix="ENTERTAINMENT")
 
 if __name__ == "__main__":
     fetch_interest_rate_data()
     fetch_nasdaq_index_data()
     fetch_gold_price_data()
     fetch_semiCondocter_data()
+    fetch_entertainment()
