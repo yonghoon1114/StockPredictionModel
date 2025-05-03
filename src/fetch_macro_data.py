@@ -39,4 +39,4 @@ if __name__ == "__main__":
     fetch_nasdaq_index_data()
     fetch_gold_price_data()
     fetch_semiCondocter_data()
-    fetch_entertainment()
+    # fetch_entertainment()
