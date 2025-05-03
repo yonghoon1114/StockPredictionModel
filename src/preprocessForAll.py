@@ -1,9 +1,8 @@
 import pandas as pd
 import os
-from config import sp500_top100, Date
 from itertools import chain
 
-
+# --- 유틸리티 함수들 (그대로 유지) ---
 def calculate_rsi(series: pd.Series, period: int = 14) -> pd.Series:
     delta = series.diff()
     gain = delta.clip(lower=0)
@@ -27,9 +26,9 @@ def read_file(path: str, col_prefix: str) -> pd.DataFrame:
     )
     return df[["Close"]].rename(columns={"Close": f"{col_prefix}_close"})
 
-def preprocess(stock_df: pd.DataFrame) -> pd.DataFrame:
+def preprocess(stock_df: pd.DataFrame, sector:str) -> pd.DataFrame:
     stock_df["RSI"] = calculate_rsi(stock_df["stock_close"])
-    stock_df["relative"] = calculate_relative(stock_df["stock_close"], stock_df["nasdaq_close"])
+    stock_df["relative"] = calculate_relative(stock_df["stock_close"], stock_df["sector_close"])
     stock_df["target"] = stock_df["stock_close"].shift(-1)
 
     election_dates = ["2020-11-03", "2024-11-05"]
@@ -38,45 +37,43 @@ def preprocess(stock_df: pd.DataFrame) -> pd.DataFrame:
         for day in election_dates
     ]
     extended_election_days = pd.DatetimeIndex(sorted(set(chain.from_iterable(election_ranges))))
-    stock_df["election_marker"] = stock_df.index.isin(extended_election_days).astype(int)  # bool -> int로 변환
+    stock_df["election_marker"] = stock_df.index.isin(extended_election_days).astype(int)
 
     return stock_df.dropna(subset=["RSI", "target"])
 
 
-def load_and_merge_data(paths: dict, financial_path: str) -> pd.DataFrame:
+def load_and_merge_data(paths: dict, financial_path: str, sector:str) -> pd.DataFrame:
     dfs = {prefix: read_file(path, prefix) for prefix, path in paths.items()}
 
-    stock = dfs["stock"].join(dfs["nasdaq"], how="left")
-    stock = preprocess(stock)
+    stock = dfs["stock"].join(dfs["nasdaq"], how="left").join(dfs["sector"], how="left")
+    stock = preprocess(stock, sector)
 
-    macro_keys = ["rate", "gold"]  # nasdaq 제거
-    for key in macro_keys:
+    for key in ["rate", "gold"]:
         stock = stock.join(dfs[key], how="left")
 
     financials = pd.read_csv(financial_path, parse_dates=["Date"]).set_index("Date")
 
-    # # financials 컬럼에 prefix 추가 (충돌 방지)
-    financials = financials.add_prefix("fin_")
+    return stock.join(financials, how="left").ffill()
 
-    full_df = stock.join(financials, how="left").ffill()
 
-    return full_df
+# --- 최적화된 실행 로직 ---
+def process_company(company_code: str, date: str, sector:str) -> None:
+    data_root = "data/raw"
+    company_path = os.path.join(data_root, "Companies", company_code)
 
-if __name__ == "__main__":
-    for companyCode in sp500_top100:     
-        data_root = "data/raw"
-        company_path = os.path.join(data_root, "Companies", companyCode)
-        paths = {
-            "stock": os.path.join(company_path, f"{companyCode}_1910-01-01_{Date}.csv"),
-            "rate": os.path.join(data_root, "INTEREST", f"IRX_1910-01-01_{Date}.csv"),
-            "nasdaq": os.path.join(data_root, "NASDAQ", f"IXIC_1910-01-01_{Date}.csv"),
-            "gold": os.path.join(data_root, "GOLD", f"GCF_2000-01-01_{Date}.csv"),
-        }
-        financial_file = os.path.join(company_path, f"{companyCode}_quarterly_financials_expanded.csv")
+    paths = {
+        "stock": os.path.join(company_path, f"{company_code}_1910-01-01_{date}.csv"),
+        "rate": os.path.join(data_root, "MACRO", f"IRX_1910-01-01_{date}.csv"),
+        "nasdaq": os.path.join(data_root, "MACRO", f"IXIC_1910-01-01_{date}.csv"),
+        "gold": os.path.join(data_root, "MACRO", f"GCF_2000-01-01_{date}.csv"),
+        "sector": os.path.join(data_root, "MACRO", f"{sector}_2000-01-01_{date}.csv"),
+    }
 
-        merged_df = load_and_merge_data(paths, financial_file)
-        save_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        merged_df.to_csv(save_path)
-        print(f"Merged data saved to {save_path}")
-        print(merged_df.head())
+    financial_file = os.path.join(company_path, f"{company_code}_quarterly_financials_expanded.csv")
+    merged_df = load_and_merge_data(paths, financial_file, sector)
+
+    save_path = os.path.join("data", "processed", f"{company_code}_{date}_merged.csv")
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    merged_df.to_csv(save_path)
+    print(f"Merged data saved to {save_path}")
+    print(merged_df.head())

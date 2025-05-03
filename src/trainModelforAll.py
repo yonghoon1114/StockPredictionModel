@@ -8,7 +8,11 @@ from tensorflow.keras.layers import MultiHeadAttention, GlobalAveragePooling1D, 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import joblib
-from config import sequenceLength, data_columns, dataNumber, Date, sp500_top100
+
+sequenceLength = 40 # 테스트 용 데이터 개수
+data_columns = ["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets", "RSI", "gold_close","election_marker","relative","sector_close"] #데이터 종류
+# data_columns = ["stock_close", "rate_close", "nasdaq_close", "Revenue", "NetIncome", "TotalAssets", "RSI", "gold_close","election_marker"] #데이터 종류
+dataNumber = len(data_columns)
 
 def load_data(path: str) -> pd.DataFrame:
     """CSV 파일을 로드하고 Date를 인덱스로 설정"""
@@ -79,12 +83,12 @@ def train_transformer_model(df: pd.DataFrame, companyCode: str):
 
     return model
 
-if __name__ == "__main__":
-    # 각 회사 코드에 대해 모델을 학습
-    for companyCode in sp500_top100:
+def trainModel(Companies_for_prediction: list, Date): 
+    for companyCode in Companies_for_prediction:
         data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
         if os.path.exists(data_path):
             df = load_data(data_path)
-            trained_model = train_transformer_model(df, companyCode)
+            train_transformer_model(df, companyCode)
         else:
             print(f"데이터 파일 {data_path}가 존재하지 않습니다.")
+    

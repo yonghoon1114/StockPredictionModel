@@ -1,9 +1,8 @@
 import yfinance as yf
 import pandas as pd
 import os
-from config import sp500_top100, Date
 
-def fetchdata(companyCode:str):
+def fetchdata(companyCode:str, Date: str):
     os.makedirs(f"data/raw/Companies/{companyCode}", exist_ok=True) # 회사 폴더 만들어서 보기 좋게
 
     # 이거 재무제표 분기별로 나누는 거임 
@@ -93,9 +92,4 @@ def fetchdata(companyCode:str):
     save_dir = f"data/raw/Companies/{companyCode}"
     fetch_quarterly_financials_merged(companyCode, save_dir)
     fetch_stock_data(companyCode, "1910-01-01", Date, save_dir)
-    
-if __name__ == "__main__":
-
-    for companyCode in sp500_top100:
-        fetchdata(companyCode)
     

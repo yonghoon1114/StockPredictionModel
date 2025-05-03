@@ -5,7 +5,7 @@ import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
-from config import sp500_top100, sequenceLength, data_columns, dataNumber, Date
+from trainModelforAll import sequenceLength, data_columns, dataNumber
 
 def load_transformer_model(model_path: str):
     return load_model(model_path, compile=False)
@@ -59,11 +59,12 @@ def predict_future_days(
     return predictions
 
 
-if __name__ == "__main__":
+def runPrediction(Companies_for_prediction: list, Date: str):
+    
     all_results = []
 
     # 각 회사별로 예측 수행
-    for companyCode in sp500_top100:
+    for companyCode in Companies_for_prediction:
         model_path = os.path.join("models", f"transformer_model_for_{companyCode}.h5")
         scaler_dir = os.path.join("models", "scalers")
         data_path = os.path.join("data", "processed", f"{companyCode}_{Date}_merged.csv")
@@ -102,7 +103,7 @@ if __name__ == "__main__":
 
         else:
             print(f"Model or data for {companyCode} is missing.")
-    
+
     # 결과를 DataFrame으로 변환하여 수익률 순서대로 정렬
     results_df = pd.DataFrame(all_results)
     results_df = results_df.sort_values(by="Profit Percent", ascending=False)

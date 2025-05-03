@@ -1,8 +1,7 @@
 import yfinance as yf
 import os
-from config import Date
 
-def fetch_data(ticker, start="1910-01-01", end=Date, save_path="data/raw", prefix="DATA"):
+def fetch_macro_data(ticker, start="1910-01-01", end = "2026-01-01" , save_path="data/raw", prefix="DATA"):
     # yfinance로 데이터 다운로드
     data = yf.download(ticker, start=start, end=end)
 
@@ -19,24 +18,3 @@ def fetch_data(ticker, start="1910-01-01", end=Date, save_path="data/raw", prefi
     print(f"Saved: {file_path}")
     return data
 
-def fetch_interest_rate_data():
-    return fetch_data(ticker="^IRX", save_path="data/raw", prefix="INTEREST")
-
-def fetch_nasdaq_index_data():
-    return fetch_data(ticker="^IXIC", save_path="data/raw", prefix="NASDAQ")
-
-def fetch_gold_price_data():
-    return fetch_data(ticker="GC=F", start="2000-01-01", end=Date, save_path="data/raw", prefix="GOLD")
-
-def fetch_semiCondocter_data():
-    return fetch_data(ticker="^SOX", start ="1910-01-01", end=Date, prefix="SEMICOND")
-
-def fetch_entertainment():
-    return fetch_data(ticker= "XLC", start="2000-01-01", end=Date, prefix="ENTERTAINMENT")
-
-if __name__ == "__main__":
-    fetch_interest_rate_data()
-    fetch_nasdaq_index_data()
-    fetch_gold_price_data()
-    fetch_semiCondocter_data()
-    # fetch_entertainment()
