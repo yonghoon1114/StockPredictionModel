@@ -4,17 +4,16 @@ from fetch_company_data_100 import fetchdata
 from fetch_macro_data import fetch_macro_data
 from preprocessForAll import process_company
 import os
-from trainModelforAll import load_data, train_transformer_model, trainModel
+from trainModelforAll import trainModel
 from predictPriceForAll import runPrediction
 
-companyCode = "TSLA"  
 Date = "2026-01-01"
 
 Companies_for_prediction = [
     'AAPL', 'MSFT', 'GOOGL', 'NVDA', 'META', 'AMZN', 'TSLA', 'ADBE', 'INTC', 'AMD'
 ]
 
-# 섹터별 매크로 지수 맵핑
+# 섹터별 대표 지수 맵핑
 sector_index_map = {
     "Technology": "^NDXT",
     "Communication Services": "^XLC",
@@ -46,7 +45,7 @@ for ticker in Companies_for_prediction:
         print(f"{ticker} sector fetch failed: {e}")
         ticker_to_sector_ticker[ticker] = None
 
-# 해당 회사들의 섹터 정보를 수집하고 매크로 지수 준비
+# 해당 회사들의 섹터 정보를 수집하고 거시경제 지수 준비
 def get_macro_sources(companies, date):
     tickers_set = set()
     for ticker in companies:
@@ -75,7 +74,7 @@ def fetch_all_macro_data(macro_sources: list):
 
 if __name__ == "__main__":
 
-    # 1. 매크로 지표 수집
+    # 1. 거시경제 지표 수집
     # macro_sources = get_macro_sources(Companies_for_prediction, Date)
     # fetch_all_macro_data(macro_sources)
 
