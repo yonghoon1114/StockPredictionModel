@@ -25,18 +25,6 @@ def fetchdata(companyCode:str, Date: str):
             end = pd.Timestamp(f"{year}-12-31")
         return start, end
 
-    def get_12_months_eps(ticker_symbol: str):
-        # 티커 객체 생성
-        ticker = yf.Ticker(ticker_symbol)
-        
-        # 12개월 EPS 값을 가져오기
-        eps_12_months = ticker.info.get("epsTrailingTwelveMonths")
-        
-        if eps_12_months is not None:
-            return eps_12_months
-        else:
-            return "EPS data not available"
-
     # 이거는 회사 재무제표 가져오는 코드임 API쓰는거라 나도 모름 잘 어떻게 한건지
     def fetch_quarterly_financials_merged(ticker: str, save_dir: str = f"data/raw/Companies/{companyCode}"):
         os.makedirs(save_dir, exist_ok=True)
@@ -77,7 +65,7 @@ def fetchdata(companyCode:str, Date: str):
 
     def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = f"data/raw/Companies/{companyCode}"):
         # yfinance에서 데이터 다운로드
-        data = yf.download(ticker, start=start, end=end)
+        data = yf.download(ticker, start=start, end=end, auto_adjust=False)
 
         # 저장 경로 없으면 생성
         os.makedirs(save_path, exist_ok=True)

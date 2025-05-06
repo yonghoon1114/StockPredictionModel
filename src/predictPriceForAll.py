@@ -77,7 +77,7 @@ def runPrediction(Companies_for_prediction: list, Date: str):
             scalers = {col: load_scaler(os.path.join(scaler_dir, f"scaler_transformer_{col}_{companyCode}.joblib")) for col in data_columns}
 
             # 예측용 데이터 준비
-            X_pred = load_data_for_prediction(data_path, scalers)
+            load_data_for_prediction(data_path, scalers)
 
             # 예측 (예: 30일 예측)
             predictions = predict_future_days(model, pd.read_csv(data_path, parse_dates=["Date"]), scalers, days=30)

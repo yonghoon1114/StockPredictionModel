@@ -4,14 +4,12 @@ from fetch_company_data_100 import fetchdata
 from fetch_macro_data import fetch_macro_data
 from preprocessForAll import process_company
 import os
-from trainModelforAll import load_data, train_transformer_model, trainModel
+from trainModelforAll import trainModel
 from predictPriceForAll import runPrediction
 
-companyCode = "TSLA"  
-Date = "2026-01-01"
-
+Date = '2026-01-01'
 Companies_for_prediction = [
-    'AAPL', 'MSFT', 'GOOGL', 'NVDA', 'META', 'AMZN', 'TSLA', 'ADBE', 'INTC', 'AMD'
+    'AAPL', 'MSFT', 'GOOGL', 'NVDA', 'META', 'AMZN', 'TSLA', 'AMD'
 ]
 
 # 섹터별 매크로 지수 맵핑
@@ -81,22 +79,22 @@ def fetch_all_macro_data(macro_sources: list):
 # ✅ 메인 실행 로직
 if __name__ == "__main__":
 
-    # # 1. 매크로 지표 수집
+    # 1. 매크로 지표 수집
     # macro_sources = get_macro_sources(Companies_for_prediction, Date)
     # fetch_all_macro_data(macro_sources)
 
-    # # 2. 각 기업 개별 데이터 수집
+    # 2. 각 기업 개별 데이터 수집
     # for companyCode in Companies_for_prediction:
     #     fetchdata(companyCode, Date)
 
-    # # 3. 데이터 전처리 (섹터 티커에서 ^ 제거하여 전달)
-    # for code in Companies_for_prediction:
-    #     sector_ticker = ticker_to_sector_ticker.get(code, None)
-    #     if sector_ticker:
-    #         sector_ticker = sector_ticker.replace("^", "")
-    #         process_company(code, Date, sector_ticker)
-    #     else:
-    #         print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
+    # 3. 데이터 전처리 (섹터 티커에서 ^ 제거하여 전달)
+    for code in Companies_for_prediction:
+        sector_ticker = ticker_to_sector_ticker.get(code, None)
+        if sector_ticker:
+            sector_ticker = sector_ticker.replace("^", "")
+            process_company(code, Date, sector_ticker)
+        else:
+            print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
 
     # 4. 모델 훈련
     trainModel(Companies_for_prediction, Date)
