@@ -6,11 +6,15 @@ from preprocessForAll import process_company
 import os
 from trainModelforAll import trainModel
 from predictPriceForAll import runPrediction
+from curl_cffi import requests
+
 
 Date = '2026-01-01'
 Companies_for_prediction = [
-    'AAPL', 'MSFT', 'GOOGL', 'NVDA', 'META', 'AMZN', 'TSLA', 'AMD'
+    'TSM','AAPL','NVDA', 'TSLA', 'PLTR'
 ]
+
+session = requests.Session(impersonate="chrome")  # 크롬처럼 위장
 
 # 섹터별 매크로 지수 맵핑
 sector_index_map = {
@@ -34,7 +38,7 @@ ticker_to_sector_ticker = {}
 # ✅ 섹터 정보 수집
 for ticker in Companies_for_prediction:
     try:
-        stock_info = yf.Ticker(ticker).info
+        stock_info = yf.Ticker(ticker, session=session).info
         sector = stock_info.get("sector", None)
         if sector and sector in sector_index_map:
             ticker_to_sector_ticker[ticker] = sector_index_map[sector]
@@ -53,9 +57,7 @@ def get_macro_sources(companies, date):
             tickers_set.add(sector_ticker)
 
     macro_sources = [
-        {"name": "interest_rate", "ticker": "^IRX", "save_path": "data/raw", "prefix": "MACRO"},
-        {"name": "nasdaq_index", "ticker": "^IXIC", "save_path": "data/raw", "prefix": "MACRO"},
-        {"name": "gold_price", "ticker": "GC=F", "start": "2000-01-01", "end": date, "save_path": "data/raw", "prefix": "MACRO"}
+       
     ]
 
     for ticker in tickers_set:
@@ -80,12 +82,15 @@ def fetch_all_macro_data(macro_sources: list):
 if __name__ == "__main__":
 
     # 1. 매크로 지표 수집
-    # macro_sources = get_macro_sources(Companies_for_prediction, Date)
-    # fetch_all_macro_data(macro_sources)
+    fetch_all_macro_data(macro_sources= [{"name": "interest_rate", "ticker": "^IRX","start" : "1910-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"name": "nasdaq_index", "ticker": "^IXIC","start" : "1910-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"name": "gold_price", "ticker": "GC=F", "start": "2000-01-01", "save_path": "data/raw", "prefix": "MACRO"}])
+    macro_sources = get_macro_sources(Companies_for_prediction, Date)
+    fetch_all_macro_data(macro_sources) 
 
     # 2. 각 기업 개별 데이터 수집
-    # for companyCode in Companies_for_prediction:
-    #     fetchdata(companyCode, Date)
+    for companyCode in Companies_for_prediction:
+        fetchdata(companyCode, Date)
 
     # 3. 데이터 전처리 (섹터 티커에서 ^ 제거하여 전달)
     for code in Companies_for_prediction:

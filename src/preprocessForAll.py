@@ -30,10 +30,10 @@ def preprocess(stock_df: pd.DataFrame, sector:str) -> pd.DataFrame:
     stock_df["RSI"] = calculate_rsi(stock_df["stock_close"])
     stock_df["relative"] = calculate_relative(stock_df["stock_close"], stock_df["sector_close"])
     stock_df["target"] = stock_df["stock_close"].shift(-1)
-
-    election_dates = ["2020-11-03", "2024-11-05"]
+    election_dates = ["2017-01-20", "2025-01-20"]
     election_ranges = [
-        pd.date_range(start=pd.to_datetime(day) - pd.DateOffset(days=30), end=pd.to_datetime(day) + pd.DateOffset(days=30))
+        pd.date_range(start=pd.to_datetime(day), 
+                    end=pd.to_datetime(day) + pd.Timedelta(days=1461))
         for day in election_dates
     ]
     extended_election_days = pd.DatetimeIndex(sorted(set(chain.from_iterable(election_ranges))))

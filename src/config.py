@@ -1,4 +1,5 @@
 
+
 companyCode = "TSLA"  
 Date = "2026-01-01"
 sequenceLength = 40 # 테스트 용 데이터 개수

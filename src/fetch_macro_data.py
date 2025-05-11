@@ -1,9 +1,12 @@
 import yfinance as yf
 import os
+from curl_cffi import requests
+
+session = requests.Session(impersonate="chrome")  # 크롬처럼 위장
 
 def fetch_macro_data(ticker, start="1910-01-01", end = "2026-01-01" , save_path="data/raw", prefix="DATA"):
     # yfinance로 데이터 다운로드
-    data = yf.download(ticker, start=start, end=end, auto_adjust=False)
+    data = yf.download(ticker, start=start, end=end, session=session)
 
     # 저장 경로 없으면 생성
     full_path = os.path.join(save_path, prefix)
