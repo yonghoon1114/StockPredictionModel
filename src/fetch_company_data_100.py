@@ -3,7 +3,7 @@ import pandas as pd
 from curl_cffi import requests
 import os
 
-session = requests.Session(impersonate="chrome")  # 크롬처럼 위장
+session = requests.Session(impersonate="edge")  # 크롬처럼 위장
 
 def fetchdata(companyCode:str, Date: str):
     os.makedirs(f"data/raw/Companies/{companyCode}", exist_ok=True) # 회사 폴더 만들어서 보기 좋게
@@ -68,7 +68,7 @@ def fetchdata(companyCode:str, Date: str):
 
     def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = f"data/raw/Companies/{companyCode}"):
         # yfinance에서 데이터 다운로드
-        data = yf.download(ticker, start=start, end=end, session=session)
+        data = yf.download(ticker, start=start, end=end, session=session, auto_adjust=True)
 
         # 저장 경로 없으면 생성
         os.makedirs(save_path, exist_ok=True)
