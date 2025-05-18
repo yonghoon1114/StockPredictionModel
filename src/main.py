@@ -35,24 +35,24 @@ sector_index_map = {
 # ✅ 섹터 정보 저장용 딕셔너리
 ticker_to_sector_ticker = {}
 
-# # ✅ 섹터 정보 수집
-# for ticker in Companies_for_prediction:
-#     try:
-#         stock_info = yf.Ticker(ticker).info
-#         if isinstance(stock_info, dict):
-#             sector = stock_info.get("sector", None)
-#             if sector and sector in sector_index_map:
-#                 ticker_to_sector_ticker[ticker] = sector_index_map[sector]
-#             else:
-#                 ticker_to_sector_ticker[ticker] = None
-#         else:
-#             print(f"[경고] {ticker}의 info 타입이 이상함: {type(stock_info)}")
-#             ticker_to_sector_ticker[ticker] = None
-#     except Exception as e:
-#         print(f"{ticker} sector fetch failed: {e}")
-#         ticker_to_sector_ticker[ticker] = None
+# ✅ 섹터 정보 수집
+for ticker in Companies_for_prediction:
 
-    # time.sleep(1.5)  # 🧘 요청 간 1.5초 쉬기
+    try:
+        stock_info = yf.Ticker(ticker).info
+        if isinstance(stock_info, dict):
+            sector = stock_info.get("sector", None)
+            if sector and sector in sector_index_map:
+                ticker_to_sector_ticker[ticker] = sector_index_map[sector]
+            else:
+                ticker_to_sector_ticker[ticker] = None
+        else:
+            print(f"[경고] {ticker}의 info 타입이 이상함: {type(stock_info)}")
+            ticker_to_sector_ticker[ticker] = None
+    except Exception as e:
+        print(f"{ticker} sector fetch failed: {e}")
+        ticker_to_sector_ticker[ticker] = None
+
 
 # ✅ 섹터별 매크로 소스 추출 함수
 def get_macro_sources(companies, date):
@@ -82,18 +82,17 @@ def fetch_all_macro_data(macro_sources: list):
     for source in macro_sources:
         kwargs = {k: v for k, v in source.items() if k != "name"}
         fetch_macro_data(**kwargs)
-        time.sleep(1.5)
 
 # ✅ 메인 실행 로직
 if __name__ == "__main__":
 
-    # # 1. 매크로 지표 수집    
-    # macro_sources = get_macro_sources(Companies_for_prediction, Date)
-    # fetch_all_macro_data(macro_sources) 
+    # 1. 매크로 지표 수집    
+    macro_sources = get_macro_sources(Companies_for_prediction, Date)
+    fetch_all_macro_data(macro_sources) 
 
-    # # 2. 각 기업 개별 데이터 수집
-    # for companyCode in Companies_for_prediction:
-    #     fetchdata(companyCode, Date)
+    # 2. 각 기업 개별 데이터 수집
+    for companyCode in Companies_for_prediction:
+        fetchdata(companyCode, Date)
 
     # # 3. 데이터 전처리 (섹터 티커에서 ^ 제거하여 전달)
     # for code in Companies_for_prediction:
@@ -104,8 +103,8 @@ if __name__ == "__main__":
     #     else:
     #         print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
 
-    # 4. 모델 훈련
-    trainModel(Companies_for_prediction, Date)
+    # # 4. 모델 훈련
+    # trainModel(Companies_for_prediction, Date)
 
-    # 5. 예측 수행 (옵션)
-    runPrediction(Companies_for_prediction, Date)
+    # # 5. 예측 수행 (옵션)
+    # runPrediction(Companies_for_prediction, Date)

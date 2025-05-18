@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 from curl_cffi import requests
 import os
-
+import time
 session = requests.Session(impersonate="edge")  # 크롬처럼 위장
 
 def fetchdata(companyCode:str, Date: str):
@@ -67,6 +67,7 @@ def fetchdata(companyCode:str, Date: str):
         print(f"Saved expanded file: {filepath}")
 
     def fetch_stock_data(ticker: str, start: str, end: str, save_path: str = f"data/raw/Companies/{companyCode}"):
+        
         # yfinance에서 데이터 다운로드
         data = yf.download(ticker, start=start, end=end, session=session, auto_adjust=True)
 
