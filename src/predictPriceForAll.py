@@ -69,11 +69,12 @@ def runPrediction(Companies_for_prediction: list, Date: str):
     results_df = results_df.sort_values(by="Profit Percent", ascending=False)
 
     # 텍스트 형식으로 누적 저장
-    output_txt = "predicted_profits_sorted.txt"
-    with open(output_txt, "a") as f:
-        f.write(f"{today_str}\n\n")
-        for _, row in results_df.iterrows():
-            f.write(f"{row['Company']},{row['Last Price']:.10f},{row['Predicted Price']:.10f},{row['Profit Percent']:.10f}\n")
-        f.write("\n")
+    output_txt = "predicted_profits_sorted.csv"
+    # 회사별로 저장하는 방식
+    for _, row in results_df.iterrows():
+        company = row['Company']
+        output_txt = f"data/predicted/{company}_predictions.csv"
+        with open(output_txt, "a") as f:
+            f.write(f"{today_str},{row['Last Price']:.10f},{row['Predicted Price']:.10f},{row['Profit Percent']:.10f}\n")
 
     print(f"Predicted profits saved to '{output_txt}'.")

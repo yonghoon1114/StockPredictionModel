@@ -8,7 +8,7 @@ from curl_cffi import requests
 Date = '2026-01-01'
 
 Companies_for_prediction = [
-    "TSM", "AAPL", "NVDA", "TSLA", "PLTR", "AMD", "AVGO"
+    "AAPL", "NVDA", "TSLA", "GOOG", "AMD", "MSFT", "META"
 ]
 
 session = requests.Session(impersonate="edge")  # 크롬처럼 위장해줘잉
@@ -107,7 +107,7 @@ def fetch_all_macro_data(macro_sources: list):
 # ✅ 메인 실행 흐름
 if __name__ == "__main__":
 
-    # # 1. 매크로 지표 수집
+    # # 1. 지표 수집
     # macro_sources = get_macro_sources(Companies_for_prediction, Date)
     # fetch_all_macro_data(macro_sources)
 
@@ -123,9 +123,9 @@ if __name__ == "__main__":
     #         process_company(code, Date, sector_ticker)
     #     else:
     #         print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
+        for i in range(9):
+            # 4. 모델 훈련 (주석 해제하면 실행됨!)
+            trainModel(Companies_for_prediction, Date)
 
-    # 4. 모델 훈련 (주석 해제하면 실행됨!)
-    trainModel(Companies_for_prediction, Date)
-
-    # 5. 예측 수행 (옵션)
-    runPrediction(Companies_for_prediction, Date)
+            # 5. 예측 수행 (옵션)
+            runPrediction(Companies_for_prediction, Date)
