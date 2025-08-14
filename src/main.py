@@ -8,7 +8,7 @@ from curl_cffi import requests
 Date = '2026-01-01'
 
 Companies_for_prediction = [
-    "AAPL", "NVDA", "TSLA", "GOOG", "AMD", "MSFT", "META"
+    "NVDA"
 ]
 
 session = requests.Session(impersonate="edge")  # 크롬처럼 위장해줘잉
@@ -79,16 +79,16 @@ def get_macro_sources(companies, date):
 
     # 기본 매크로 소스 3개
     macro_sources = [
-        {"ticker": "^IRX", "start": "1910-01-01", "save_path": "data/raw", "prefix": "MACRO"},
-        {"ticker": "^IXIC", "start": "1910-01-01", "save_path": "data/raw", "prefix": "MACRO"},
-        {"ticker": "GC=F",  "start": "2000-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"ticker": "^IRX", "start": "2010-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"ticker": "^IXIC", "start": "2010-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"ticker": "GC=F",  "start": "2010-01-01", "save_path": "data/raw", "prefix": "MACRO"},
     ]
 
     # 섹터별 매크로 인덱스 추가
     for ticker in sector_tickers:
         macro_sources.append({
             "ticker": ticker,
-            "start": "2000-01-01",
+            "start": "2010-01-01",
             "end": date,
             "save_path": "data/raw",
             "prefix": "MACRO"
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     # for companyCode in Companies_for_prediction:
     #     fetchdata(companyCode, Date)
 
-    # # 3. 전처리 (섹터 티커에서 ^ 제거)
+    # # 3. 전처리
     # for code in Companies_for_prediction:
     #     sector_ticker = ticker_to_sector_ticker.get(code)
     #     if sector_ticker:
@@ -123,9 +123,9 @@ if __name__ == "__main__":
     #         process_company(code, Date, sector_ticker)
     #     else:
     #         print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
-        for i in range(9):
-            # 4. 모델 훈련 (주석 해제하면 실행됨!)
-            trainModel(Companies_for_prediction, Date)
+        # for i in range(9):
+        # 4. 모델 훈련 (주석 해제하면 실행됨!)
+        trainModel(Companies_for_prediction, Date)
 
-            # 5. 예측 수행 (옵션)
-            runPrediction(Companies_for_prediction, Date)
+        # 5. 예측 수행 (옵션)
+        runPrediction(Companies_for_prediction, Date)

@@ -4,7 +4,7 @@ from curl_cffi import requests
 import time
 session = requests.Session(impersonate="edge")  # 크롬처럼 위장
 
-def fetch_macro_data(ticker, start="1910-01-01", end = "2026-01-01" , save_path="data/raw", prefix="DATA"):
+def fetch_macro_data(ticker, start="2010-01-01", end = "2026-01-01" , save_path="data/raw", prefix="DATA"):
     # yfinance로 데이터 다운로드
     data = yf.download(ticker, start=start, end=end, session=session, auto_adjust=True)
     

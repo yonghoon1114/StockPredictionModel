@@ -83,5 +83,5 @@ def fetchdata(companyCode:str, Date: str):
 
     save_dir = f"data/raw/Companies/{companyCode}"
     fetch_quarterly_financials_merged(companyCode, save_dir)
-    fetch_stock_data(companyCode, "1910-01-01", Date, save_dir)
+    fetch_stock_data(companyCode, "2010-01-01", Date, save_dir)
     

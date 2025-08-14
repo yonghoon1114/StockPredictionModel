@@ -62,11 +62,11 @@ def process_company(company_code: str, date: str, sector:str) -> None:
     company_path = os.path.join(data_root, "Companies", company_code)
 
     paths = {
-        "stock": os.path.join(company_path, f"{company_code}_1910-01-01_{date}.csv"),
-        "rate": os.path.join(data_root, "MACRO", f"IRX_1910-01-01_{date}.csv"),
-        "nasdaq": os.path.join(data_root, "MACRO", f"IXIC_1910-01-01_{date}.csv"),
-        "gold": os.path.join(data_root, "MACRO", f"GCF_2000-01-01_{date}.csv"),
-        "sector": os.path.join(data_root, "MACRO", f"{sector}_2000-01-01_{date}.csv"),
+        "stock": os.path.join(company_path, f"{company_code}_2010-01-01_{date}.csv"),
+        "rate": os.path.join(data_root, "MACRO", f"IRX_2010-01-01_{date}.csv"),
+        "nasdaq": os.path.join(data_root, "MACRO", f"IXIC_2010-01-01_{date}.csv"),
+        "gold": os.path.join(data_root, "MACRO", f"GCF_2010-01-01_{date}.csv"),
+        "sector": os.path.join(data_root, "MACRO", f"{sector}_2010-01-01_{date}.csv"),
     }
 
     financial_file = os.path.join(company_path, f"{company_code}_quarterly_financials_expanded.csv")
