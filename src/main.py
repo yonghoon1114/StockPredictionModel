@@ -8,10 +8,10 @@ from curl_cffi import requests
 Date = '2026-01-01'
 
 Companies_for_prediction = [
-    "NVDA"
+   "META","MSFT"
 ]
 
-session = requests.Session(impersonate="edge")  # 크롬처럼 위장해줘잉
+session = requests.Session(impersonate="edge")
 
 #======================================================================================
 # 더 자동화 된 코드 api호출 문제 때문에 주석 해놓음음
@@ -43,7 +43,10 @@ ticker_to_sector_name = {
     "TSLA": "Consumer Cyclical",
     "PLTR": "Technology",
     "AMD": "Semiconductors",
-    "AVGO": "Semiconductors"
+    "AVGO": "Semiconductors",
+    "META": "Communication Services",
+    "MSFT": "Technology",
+    "GOOGL": "Communication Services"
 }
 
 # ✅ 섹터 이름 → 섹터별 인덱스 티커 매핑
@@ -113,7 +116,7 @@ if __name__ == "__main__":
 
     # # 2. 각 기업의 개별 데이터 수집
     # for companyCode in Companies_for_prediction:
-    #     fetchdata(companyCode, Date)
+        # fetchdata(companyCode, Date)
 
     # # 3. 전처리
     # for code in Companies_for_prediction:
@@ -123,7 +126,8 @@ if __name__ == "__main__":
     #         process_company(code, Date, sector_ticker)
     #     else:
     #         print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
-        # for i in range(9):
+    
+    for i in range(4):
         # 4. 모델 훈련 (주석 해제하면 실행됨!)
         trainModel(Companies_for_prediction, Date)
 
