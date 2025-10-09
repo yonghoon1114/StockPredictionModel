@@ -68,8 +68,10 @@ def runPrediction(Companies_for_prediction: list, Date: str):
     results_df = pd.DataFrame(all_results)
     results_df = results_df.sort_values(by="Profit Percent", ascending=False)
 
-    # 텍스트 형식으로 누적 저장
-    output_txt = "predicted_profits_sorted.csv"
+    # # 텍스트 형식으로 누적 저장
+    # output_txt = "predicted_profits_sorted.csv"
+    # output_txt = f"data/predicted/{company}_predictions.csv"
+ 
     # 회사별로 저장하는 방식
     for _, row in results_df.iterrows():
         company = row['Company']

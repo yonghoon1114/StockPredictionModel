@@ -1,14 +1,15 @@
-from fetch_company_data_100 import fetchdata
+from fetch_company_data_100 import fetch_data
 from fetch_macro_data import fetch_macro_data
 from preprocessForAll import process_company
 from trainModelforAll import trainModel
 from predictPriceForAll import runPrediction
 from curl_cffi import requests
+from datetime import date
 
-Date = '2026-01-01'
+Date = date.today()
 
 Companies_for_prediction = [
-   "META","MSFT"
+   "AAPL","TSLA","NVDA","MSFT"
 ]
 
 session = requests.Session(impersonate="edge")
@@ -82,16 +83,16 @@ def get_macro_sources(companies, date):
 
     # 기본 매크로 소스 3개
     macro_sources = [
-        {"ticker": "^IRX", "start": "2010-01-01", "save_path": "data/raw", "prefix": "MACRO"},
-        {"ticker": "^IXIC", "start": "2010-01-01", "save_path": "data/raw", "prefix": "MACRO"},
-        {"ticker": "GC=F",  "start": "2010-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"ticker": "^IRX", "start": "1910-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"ticker": "^IXIC", "start": "1910-01-01", "save_path": "data/raw", "prefix": "MACRO"},
+        {"ticker": "GC=F",  "start": "1910-01-01", "save_path": "data/raw", "prefix": "MACRO"},
     ]
 
     # 섹터별 매크로 인덱스 추가
     for ticker in sector_tickers:
         macro_sources.append({
             "ticker": ticker,
-            "start": "2010-01-01",
+            "start": "1910-01-01",
             "end": date,
             "save_path": "data/raw",
             "prefix": "MACRO"
@@ -116,7 +117,7 @@ if __name__ == "__main__":
 
     # # 2. 각 기업의 개별 데이터 수집
     # for companyCode in Companies_for_prediction:
-        # fetchdata(companyCode, Date)
+    #     fetch_data(companyCode, Date)
 
     # # 3. 전처리
     # for code in Companies_for_prediction:
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     #     else:
     #         print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
     
-    for i in range(4):
+    for i in range(3):
         # 4. 모델 훈련 (주석 해제하면 실행됨!)
         trainModel(Companies_for_prediction, Date)
 
