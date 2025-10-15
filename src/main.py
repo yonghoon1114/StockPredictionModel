@@ -15,7 +15,7 @@ Companies_for_prediction = [
 session = requests.Session(impersonate="edge")
 
 #======================================================================================
-# 더 자동화 된 코드 api호출 문제 때문에 주석 해놓음음
+# 더 자동화 된 코드 api호출 문제 때문에 주석 해놓음
 # ✅ 섹터 정보 수집
 
 # for ticker in Companies_for_prediction:
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
     # # 2. 각 기업의 개별 데이터 수집
     # for companyCode in Companies_for_prediction:
-    #     fetch_data(companyCode, Date)
+    #     fetch_data(companyCode)
 
     # # 3. 전처리
     # for code in Companies_for_prediction:
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     
     for i in range(3):
         # 4. 모델 훈련 (주석 해제하면 실행됨!)
-        trainModel(Companies_for_prediction, Date)
+        trainModel(Companies_for_prediction,Date)
 
         # 5. 예측 수행 (옵션)
-        runPrediction(Companies_for_prediction, Date)
+        runPrediction(Companies_for_prediction,Date)

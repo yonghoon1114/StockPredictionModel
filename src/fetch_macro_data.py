@@ -21,16 +21,29 @@ def fetch_macro_data(ticker, start="1910-01-01", end=None, save_path="data/raw",
         last_date = existing["Date"].max().date()
         new_start = last_date + timedelta(days=1)
 
-        # 최신 상태면 업데이트 안 함
-        if new_start >= date.fromisoformat(end):
+        if pd.Timestamp(new_start) >= pd.Timestamp(end):
             print(f"{ticker}: up to date ({last_date})")
             return existing
 
         print(f"{ticker}: updating from {new_start} to {end}")
-        new_data = yf.download(ticker, start=new_start.strftime("%Y-%m-%d"), end=end, session=session, auto_adjust=True)
+        new_data = yf.download(
+            ticker,
+            start=new_start.strftime("%Y-%m-%d"),
+            end=end,
+            session=session,
+            auto_adjust=True
+        )
 
         if not new_data.empty:
             new_data.reset_index(inplace=True)
+            
+            # MultiIndex 컬럼 처리
+            if isinstance(new_data.columns, pd.MultiIndex):
+                new_data.columns = [col[0] if col[0] != '' else col[1] for col in new_data.columns]
+            
+            # 컬럼명 강제 설정
+            new_data = new_data[["Date", "Close", "High", "Low", "Open", "Volume"]]
+
             merged = pd.concat([existing, new_data], ignore_index=True)
             merged.drop_duplicates(subset="Date", keep="last", inplace=True)
             merged.sort_values("Date", inplace=True)
@@ -46,6 +59,14 @@ def fetch_macro_data(ticker, start="1910-01-01", end=None, save_path="data/raw",
         print(f"{ticker}: downloading full history...")
         data = yf.download(ticker, start=start, end=end, session=session, auto_adjust=True)
         data.reset_index(inplace=True)
+
+        # MultiIndex 컬럼 처리
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = [col[0] if col[0] != '' else col[1] for col in data.columns]
+
+        # 컬럼명 강제 설정
+        data = data[["Date", "Close", "High", "Low", "Open", "Volume"]]
+
         data.to_csv(file_path, index=False)
         print(f"Saved new file: {file_path}")
         return data

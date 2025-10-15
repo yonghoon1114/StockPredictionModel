@@ -19,8 +19,6 @@ def calculate_relative(stock_close: pd.Series, index: pd.Series) -> pd.Series:
 def read_file(path: str, col_prefix: str) -> pd.DataFrame:
     df = pd.read_csv(
         path,
-        header=2,
-        names=["Date", "Close", "High", "Low", "Open", "Volume"],
         parse_dates=["Date"],
         index_col="Date"
     )
@@ -62,11 +60,11 @@ def process_company(company_code: str, date: str, sector:str) -> None:
     company_path = os.path.join(data_root, "Companies", company_code)
 
     paths = {
-        "stock": os.path.join(company_path, f"{company_code}_1910-01-01_{date}.csv"),
-        "rate": os.path.join(data_root, "MACRO", f"IRX_1910-01-01_{date}.csv"),
-        "nasdaq": os.path.join(data_root, "MACRO", f"IXIC_1910-01-01_{date}.csv"),
-        "gold": os.path.join(data_root, "MACRO", f"GCF_1910-01-01_{date}.csv"),
-        "sector": os.path.join(data_root, "MACRO", f"{sector}_1910-01-01_{date}.csv"),
+        "stock": os.path.join(company_path, f"{company_code}_stock.csv"),
+        "rate": os.path.join(data_root, "MACRO", f"IRX_macro.csv"),
+        "nasdaq": os.path.join(data_root, "MACRO", f"IXIC_macro.csv"),
+        "gold": os.path.join(data_root, "MACRO", f"GCF_macro.csv"),
+        "sector": os.path.join(data_root, "MACRO", f"{sector}_macro.csv"),
     }
 
     financial_file = os.path.join(company_path, f"{company_code}_quarterly_financials_expanded.csv")
