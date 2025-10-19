@@ -9,7 +9,7 @@ from datetime import date
 Date = date.today()
 
 Companies_for_prediction = [
-   "AAPL","TSLA","NVDA","MSFT"
+   "AMD"
 ]
 
 session = requests.Session(impersonate="edge")
@@ -47,7 +47,7 @@ ticker_to_sector_name = {
     "AVGO": "Semiconductors",
     "META": "Communication Services",
     "MSFT": "Technology",
-    "GOOGL": "Communication Services"
+    "GOOG": "Communication Services"
 }
 
 # ✅ 섹터 이름 → 섹터별 인덱스 티커 매핑
