@@ -9,8 +9,8 @@ from datetime import date
 Date = date.today()
 
 Companies_for_prediction = [
-   "AMD"
-]
+   ""
+   ]
 
 session = requests.Session(impersonate="edge")
 
@@ -119,14 +119,14 @@ if __name__ == "__main__":
     # for companyCode in Companies_for_prediction:
     #     fetch_data(companyCode)
 
-    # # 3. 전처리
-    # for code in Companies_for_prediction:
-    #     sector_ticker = ticker_to_sector_ticker.get(code)
-    #     if sector_ticker:
-    #         sector_ticker = sector_ticker.replace("^", "")
-    #         process_company(code, Date, sector_ticker)
-    #     else:
-    #         print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
+    # 3. 전처리
+    for code in Companies_for_prediction:
+        sector_ticker = ticker_to_sector_ticker.get(code)
+        if sector_ticker:
+            sector_ticker = sector_ticker.replace("^", "")
+            process_company(code, Date, sector_ticker)
+        else:
+            print(f"[경고] {code}의 섹터 정보를 찾을 수 없어 전처리를 건너뜁니다.")
     
     for i in range(3):
         # 4. 모델 훈련 (주석 해제하면 실행됨!)
