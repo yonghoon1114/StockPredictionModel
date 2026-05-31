@@ -3,6 +3,7 @@ import time
 import requests
 import pandas as pd
 import FinanceDataReader as fdr
+import yfinance as yf
 from datetime import date, timedelta
 from config import DART_API_KEY
 
@@ -11,7 +12,7 @@ from config import DART_API_KEY
 # 유틸
 # -----------------------------------------------------------------------
 
-def _get_corp_code( stock_code: str) -> str | None:
+def _get_corp_code(stock_code: str) -> str | None:
     """종목코드 → DART 고유 기업코드 변환"""
     url = "https://opendart.fss.or.kr/api/corpCode.xml"
     params = {"crtfc_key": DART_API_KEY}
@@ -87,11 +88,11 @@ def fetch_stock_price_kr(stock_code: str, save_dir: str) -> pd.DataFrame:
 # 재무제표 (DART)
 # -----------------------------------------------------------------------
 
-def fetch_financial_statements(api_key: str, corp_code: str, stock_code: str, save_dir: str) -> pd.DataFrame:
+def fetch_financial_statements(corp_code: str, stock_code: str, save_dir: str) -> pd.DataFrame:
     """
     DART 단일회사 전체 재무제표 수집
-    - 최근 4년치 연간 데이터
-    - 손익계산서, 대차대조표, 현금흐름표 포함
+    - 최근 4년치 연간 + 반기 데이터
+    - 연결재무제표 우선, 없으면 개별재무제표
     """
     os.makedirs(save_dir, exist_ok=True)
     file_path = os.path.join(save_dir, f"{stock_code}_financials.csv")
@@ -107,7 +108,7 @@ def fetch_financial_statements(api_key: str, corp_code: str, stock_code: str, sa
                 "corp_code": corp_code,
                 "bsns_year": str(year),
                 "reprt_code": report_code,
-                "fs_div": "CFS"  # 연결재무제표 (없으면 OFS 개별로 fallback)
+                "fs_div": "CFS"  # 연결재무제표 우선
             }
 
             try:
@@ -149,11 +150,8 @@ def fetch_financial_statements(api_key: str, corp_code: str, stock_code: str, sa
     return df
 
 
-def fetch_info_kr(api_key: str, corp_code: str, stock_code: str, save_dir: str) -> dict:
-    """
-    DART 기업 개황 수집
-    - 회사명, 업종, 대표자, 자본금 등
-    """
+def fetch_info_kr(corp_code: str, stock_code: str, save_dir: str) -> dict:
+    """DART 기업 개황 수집"""
     url = "https://opendart.fss.or.kr/api/company.json"
     params = {"crtfc_key": DART_API_KEY, "corp_code": corp_code}
 
@@ -185,13 +183,58 @@ def fetch_info_kr(api_key: str, corp_code: str, stock_code: str, save_dir: str) 
 
 
 # -----------------------------------------------------------------------
+# yfinance 보완 (시가총액, 밸류에이션)
+# -----------------------------------------------------------------------
+
+def fetch_yf_supplement(stock_code: str, save_dir: str) -> dict:
+    """
+    yfinance로 한국 주식 보완 데이터 수집
+    - DART에 없는 시가총액, PER, PBR 등
+    - 종목코드 뒤에 .KS (코스피) 또는 .KQ (코스닥) 붙여야 함
+    - 실패해도 괜찮음 (DART 데이터로 대체)
+    """
+    suffixes = [".KS", ".KQ"]
+
+    for suffix in suffixes:
+        try:
+            ticker = f"{stock_code}{suffix}"
+            info = yf.Ticker(ticker).info
+
+            # 유효한 데이터인지 확인 (시가총액이 있으면 유효)
+            if not info.get("marketCap"):
+                continue
+
+            supplement = {
+                "market_cap": info.get("marketCap"),
+                "current_price": info.get("currentPrice") or info.get("regularMarketPrice"),
+                "PER": info.get("trailingPE"),
+                "forward_PER": info.get("forwardPE"),
+                "PBR": info.get("priceToBook"),
+                "dividend_yield": info.get("dividendYield"),
+                "shares_outstanding": info.get("sharesOutstanding"),
+                "long_name": info.get("longName"),
+            }
+
+            path = os.path.join(save_dir, f"{stock_code}_yf_supplement.csv")
+            pd.DataFrame([supplement]).to_csv(path, index=False)
+            print(f"[{stock_code}] yfinance 보완 데이터 저장 ({ticker})")
+            return supplement
+
+        except Exception as e:
+            print(f"[{stock_code}] yfinance {suffix} 실패: {e}")
+
+    print(f"[{stock_code}] yfinance 보완 데이터 없음")
+    return {}
+
+
+# -----------------------------------------------------------------------
 # 진입점
 # -----------------------------------------------------------------------
 
 def fetch_kr(stock_code: str, base_dir: str = "data/raw/kr") -> dict:
     """
     한국 종목 전체 데이터 수집 진입점
-    
+
     stock_code: 6자리 종목코드 (예: "005930" 삼성전자)
     """
     save_dir = os.path.join(base_dir, stock_code)
@@ -208,22 +251,25 @@ def fetch_kr(stock_code: str, base_dir: str = "data/raw/kr") -> dict:
         return {"stock_code": stock_code, "stock": stock_df}
 
     # 3. 재무제표
-    financials_df = fetch_financial_statements(DART_API_KEY, corp_code, stock_code, save_dir)
+    financials_df = fetch_financial_statements(corp_code, stock_code, save_dir)
 
     # 4. 기업 개황
-    info = fetch_info_kr(DART_API_KEY, corp_code, stock_code, save_dir)
+    info = fetch_info_kr(corp_code, stock_code, save_dir)
+
+    # 5. yfinance 보완 (시가총액, PER, PBR 등)
+    yf_supplement = fetch_yf_supplement(stock_code, save_dir)
 
     return {
         "stock_code": stock_code,
         "stock": stock_df,
         "financials": financials_df,
-        "info": info
+        "info": info,
+        "yf_supplement": yf_supplement
     }
 
 
 if __name__ == "__main__":
-
     # 삼성전자, SK하이닉스
     stocks = ["005930", "000660"]
     for code in stocks:
-        fetch_kr(code, DART_API_KEY)
+        fetch_kr(code)

@@ -1,3 +1,6 @@
+import os
+import json
+from datetime import datetime
 import google.generativeai as genai
 from config import GEMINI_API_KEY
 
@@ -10,8 +13,6 @@ model = genai.GenerativeModel("gemini-3.5-flash")
 # -----------------------------------------------------------------------
 
 def _build_prompt(data: dict) -> str:
-    """preprocess 결과물을 Gemini 프롬프트로 변환"""
-
     def _fmt(val, suffix=""):
         return f"{val}{suffix}" if val is not None else "데이터 없음"
 
@@ -22,7 +23,29 @@ def _build_prompt(data: dict) -> str:
     sz = data.get("size", {})
 
     prompt = f"""
-너는 전문 주식 애널리스트야. 아래 재무 데이터를 바탕으로 분석 리포트를 작성해줘. 부채와 재무안정성, 현금흐름을 중심으로 해주고 
+너는 피터 린치, 워렌 버핏, 벤저민 그레이엄의 분석 방식을 결합한 투자 분석가다.
+
+목표:
+현재 주가가 저평가인지 판단하라.
+
+특히 다음을 중점적으로 분석하라.
+
+- 앞으로 10년 뒤에도 존재할 사업인가
+- 경쟁우위가 있는가
+- 현재 실적이 일시적 호황인가
+- 순이익 증가가 지속 가능한가
+- 현금흐름이 순이익을 뒷받침하는가
+- 현재 주가가 과열 상태인가
+
+최종적으로:
+
+1. 적정주가 범위
+2. 현재 주가 대비 할인율
+3. 투자 매력도(0~100)
+4. 투자하지 말아야 할 이유
+5. 가장 우려되는 위험 요소
+
+를 제시하라.
 
 ==============================================
 종목: {data.get('ticker')} ({data.get('name', '이름 없음')})
@@ -61,12 +84,16 @@ def _build_prompt(data: dict) -> str:
 ==============================================
 
 위 데이터를 바탕으로 아래 형식으로 분석해줘.
+반드시 JSON 형식으로만 응답하고 다른 텍스트는 절대 포함하지 마.
 
-1. 종합 평가: 매수 / 중립 / 매도 중 하나로 판단하고 이유 2~3줄
-2. 핵심 강점: 3가지 이내
-3. 주요 리스크: 3가지 이내
-4. 투자 판단 근거: 수치 기반으로 구체적으로
-5. 주의사항: 이 분석의 한계나 추가로 확인해야 할 것들
+{{
+  "overall": "매수 / 중립 / 매도 중 하나",
+  "summary": "종합 평가 2~3줄",
+  "strengths": ["강점1", "강점2", "강점3"],
+  "risks": ["리스크1", "리스크2", "리스크3"],
+  "rationale": "수치 기반 투자 판단 근거 구체적으로",
+  "caution": "이 분석의 한계나 추가 확인 사항"
+}}
 
 한국어로 작성해줘.
 """
@@ -77,16 +104,55 @@ def _build_prompt(data: dict) -> str:
 # Gemini 호출
 # -----------------------------------------------------------------------
 
-def analyze(data: dict) -> str:
+def analyze(data: dict) -> dict:
     """
-    preprocess 결과물을 받아 Gemini로 분석 후 리포트 반환
-
-    data: preprocess() 결과 dict
+    preprocess 결과물을 받아 Gemini로 분석 후 결과 dict 반환
     """
     prompt = _build_prompt(data)
 
     try:
         response = model.generate_content(prompt)
-        return response.text
+        text = response.text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        result = json.loads(text)
+    except json.JSONDecodeError:
+        result = {"error": "JSON 파싱 실패", "raw": response.text}
     except Exception as e:
-        return f"[{data.get('ticker')}] 분석 실패: {e}"
+        result = {"error": str(e)}
+
+    return result
+
+
+# -----------------------------------------------------------------------
+# 저장
+# -----------------------------------------------------------------------
+
+def save_report(ticker: str, data: dict, result: dict, base_dir: str = "data/reports"):
+    """
+    분석 결과를 JSON 파일로 저장
+    - 종목별로 파일 하나
+    - 실행할 때마다 날짜별로 누적 저장
+    """
+    os.makedirs(base_dir, exist_ok=True)
+    file_path = os.path.join(base_dir, f"{ticker}.json")
+
+    # 기존 파일 있으면 불러오기
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            existing = json.load(f)
+    else:
+        existing = []
+
+    # 새 레코드 추가
+    record = {
+        "date": datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+        "ticker": ticker,
+        "market": data.get("market"),
+        "current_price": data.get("current_price"),
+        "analysis": result
+    }
+    existing.append(record)
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(existing, f, ensure_ascii=False, indent=2)
+
+    print(f"[{ticker}] 분석 결과 저장 완료: {file_path}")
