@@ -1,0 +1,52 @@
+{
+  "date": "2026-06-23 13:32:34",
+  "ticker": "GOOG",
+  "market": "US",
+  "current_price": 348.7799987792969,
+  "analysis": {
+    "company_type": [
+      "성장주",
+      "대형 우량주"
+    ],
+    "company_type_reason": "매출 YoY 21.8%의 견조한 성장세와 순이익률 37.92%, ROE 38.88%라는 압도적 수익성을 동시에 갖춘 성숙한 성장 기업임.",
+    "weight_applied": "성숙 성장주/우량주 모델 적용 (수익성 30% | 성장성 25% | 경쟁우위 25% | 밸류에이션 20%)",
+    "growth_analysis": {
+      "quality": "구조적 성장",
+      "sustainability": "검색 광고의 시장 지배력과 클라우드(GCP), AI 모델(Gemini) 도입을 통한 구조적 성장이 지속될 것으로 판단됨.",
+      "rule_of_40": "21.8 + 36.12 = 57.92 (40 이상으로 매우 건강함)"
+    },
+    "market_opportunity": "디지털 광고 시장의 지속적 우위와 생성형 AI를 통한 검색 경험 혁신, 클라우드 부문의 고성장으로 TAM이 지속 확장 중.",
+    "competitive_advantage": "압도적인 데이터 독점력(네트워크 효과), 독보적인 AI 기술 특허, 유튜브를 통한 강력한 콘텐츠 생태계라는 깊은 해자를 보유함.",
+    "valuation_method": "PEG ratio (Forward PER 23.58 / 연평균 성장률), FCF Yield",
+    "valuation_analysis": "현재 Forward PER 23.58은 높은 이익 성장률(순이익 YoY 82%) 대비 매우 합리적인 수준임. 우량주 관점에서 볼 때 PEG가 1 미만으로 형성되어 있어 밸류에이션 매력이 충분함.",
+    "risks": [
+      "성장 둔화 리스크(검색 시장 점유율 경쟁)",
+      "글로벌 규제 당국의 반독점 소송 리스크",
+      "AI 설비 투자(CAPEX) 급증에 따른 단기 수익성 희석"
+    ],
+    "conclusion": {
+      "price_evaluation": "저평가",
+      "fair_value_range": "350~400 USD (수익성 및 AI 기술 프리미엄 반영 시)",
+      "investment_score": 90,
+      "growth_score": 85,
+      "value_score": 80,
+      "strengths": [
+        "압도적인 영업이익률",
+        "구조적인 강력한 현금 흐름",
+        "AI 분야 기술 선도력"
+      ],
+      "key_risks": [
+        "규제 리스크",
+        "검색 시장 경쟁 심화",
+        "빅테크 대규모 투자에 대한 시장 의구심"
+      ],
+      "five_year_outlook": "AI 기반 서비스의 본격적 수익화와 클라우드 시장 점유율 확대로 꾸준한 우상향이 기대됨.",
+      "suitable_investor": [
+        "장기 성장형 투자자",
+        "우량주 중심의 포트폴리오를 구성하는 기관투자자"
+      ],
+      "final_opinion": "매수"
+    },
+    "caution": "본 분석은 과거 데이터와 시장 전망치를 기반으로 하며, AI 도입에 따른 실제 수익화 속도가 모델 가정과 다를 경우 밸류에이션 재평가가 필요함."
+  }
+}

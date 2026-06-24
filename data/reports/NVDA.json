@@ -20,5 +20,72 @@
       "rationale": "엔비디아는 AI 인프라 구축의 핵심인 GPU 시장을 독점하며 총매출 253.49B 달러, 매출총이익률 74.14%라는 경이로운 성과를 기록 중입니다. AI 수요 폭증으로 순이익이 전년 대비 214.5% 급증했음에도 불구하고, 선행 주가수익비율(Forward PER)은 16.68배 수준에 불과하여 고성장 기술주 대비 극도의 밸류에이션 매력을 보유하고 있습니다. 유동비율(3.44)과 당좌비율(2.13)이 매우 높아 부채 상환 능력이 충분하며, 매년 46.34B 달러에 달하는 막대한 잉여현금흐름(FCF)을 바탕으로 주주환원 및 R&D 재투자를 지속할 수 있어 현 시점 강력한 매수 기회로 판단됩니다.",
       "caution": "본 분석은 현재 PER, PBR, PSR 및 시가총액 등 일부 핵심 밸류에이션 데이터가 누락된 상태에서 작성되었습니다. 특히 부채비율(6.555) 수치의 산출 기준(배율 혹은 백분율 여부)에 대한 추가 검증이 필요하며, 향후 HBM 수급 불균형 및 AI 투자 사이클의 둔화 가능성을 지속적으로 추적 관찰해야 합니다."
     }
+  },
+  {
+    "date": "2026-06-03 13:39:09",
+    "ticker": "NVDA",
+    "market": "US",
+    "current_price": 222.82000732421875,
+    "analysis": {
+      "error": "400 * GenerateContentRequest.model: unexpected model name format\n"
+    }
+  },
+  {
+    "date": "2026-06-06 08:17:34",
+    "ticker": "NVDA",
+    "market": "US",
+    "current_price": 205.10000610351562,
+    "analysis": {
+      "error": "400 * GenerateContentRequest.model: unexpected model name format\n"
+    }
+  },
+  {
+    "date": "2026-06-06 08:26:41",
+    "ticker": "NVDA",
+    "market": "US",
+    "current_price": 205.1000061035156,
+    "analysis": {
+      "investment_profile": {
+        "stock_type": [
+          "초고성장주",
+          "대형 우량주"
+        ],
+        "industry_cycle": "구조적 성장",
+        "valuation_rating": "저평가"
+      },
+      "guru_perspectives": {
+        "warren_buffett": "매수 고려 - 독점적인 해자(CUDA 생태계 및 80% 이상의 시장 점유율)와 114.29%에 달하는 경이적인 ROE, 낮은 부채비율(6.56%)은 버핏이 선호하는 프랜차이즈 기업의 조건을 완벽히 충족함. 다만, 기술 변화 속도가 빠르다는 점은 우려 요인임.",
+        "peter_lynch": "강력 매수 - 순이익 성장률이 214.5%에 달하는 반면, Forward PER은 16.17배에 불과해 PEG(주가수익성장비율)가 0.1 이하로 계산됨. 이는 린치 관점에서 성장에 비해 주가가 극도로 저평가된 전형적인 매수 기회임.",
+        "benjamin_graham": "관망 - 뛰어난 수익성과 현금흐름은 인정하나, PBR이 31.69배로 자산 가치 대비 주가가 매우 높고 역사적 안전마진 기준을 충족하지 못하므로 보수적 관점 유지."
+      },
+      "analysis_details": {
+        "strengths": [
+          "CUDA 하드웨어-소프트웨어 통합 생태계가 구축한 강력한 전환비용 및 시장 진입장벽",
+          "영업이익률 65.6%, 순이익률 62.97%로 업계 평균을 압도하는 압도적인 수익성 및 가격 결정력",
+          "부채비율 6.56% 및 유동비율 3.44배로 재무적 리스크가 거의 없는 무결점의 재무 건전성"
+        ],
+        "risks": [
+          "빅테크 기업들(자체 칩 개발)의 자체 AI 가속기 내재화 추진으로 인한 장기적 고객 의존도 감소 위험",
+          "미-중 갈등에 따른 미세공정 반도체 수출 규제 등 지정학적 및 규제적 리스크",
+          "AI 인프라 과잉 투자 논란으로 인한 CAPEX 사이클의 일시적 둔화 가능성"
+        ],
+        "rationale": "엔비디아는 매출 성장률 85.2%, 순이익 성장률 214.5%를 기록하며 AI 산업의 구조적 성장을 직접적으로 수혜받고 있습니다. 현재가 205.10달러 기준 PER은 31.46배, Forward PER은 16.17배 수준으로, 초고성장 기업의 프리미엄을 감안할 때 밸류에이션 매력이 매우 높습니다. 1,256억 달러의 막대한 영업현금흐름이 실적의 고품질을 증명하고 있으며, AI 패러다임이 구조적 초입 단계에 있음을 고려할 때 현재 주가는 성장성 대비 과도하게 저평가되어 있습니다."
+      },
+      "final_conclusion": {
+        "target_price_range": "310.00 USD ~ 380.00 USD",
+        "investment_score": 92,
+        "action_opinion": "강력 매수",
+        "caution": "제공된 재무 데이터상 총매출 수치(2,534억 달러) 및 현재가(205.10달러)는 액면분할 등의 시점 차이에 따른 왜곡이 존재할 수 있으므로 최신 분기 보고서(10-Q)의 주식수 변동 및 실제 시가총액을 재확인해야 합니다."
+      }
+    }
+  },
+  {
+    "date": "2026-06-07 13:17:50",
+    "ticker": "NVDA",
+    "market": "US",
+    "current_price": 205.10000610351562,
+    "analysis": {
+      "error": "404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods."
+    }
   }
 ]

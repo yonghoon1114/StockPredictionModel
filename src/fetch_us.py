@@ -14,7 +14,16 @@ def fetch_stock_price(ticker: str, save_dir: str) -> pd.DataFrame:
     end = date.today().strftime("%Y-%m-%d")
 
     if os.path.exists(file_path):
-        existing = pd.read_csv(file_path, parse_dates=["Date"])
+        existing = pd.read_csv(file_path)
+        existing["Date"] = pd.to_datetime(existing["Date"], errors="coerce")
+        existing = existing.dropna(subset=["Date"])
+
+        # 빈 파일이면 전체 다운로드
+        if existing.empty:
+            print(f"[{ticker}] CSV 비어있음, 전체 다운로드")
+            os.remove(file_path)
+            return fetch_stock_price(ticker, save_dir)
+
         last_date = existing["Date"].max().date()
         new_start = last_date + timedelta(days=1)
 

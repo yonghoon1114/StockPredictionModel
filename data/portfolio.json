@@ -1,0 +1,9 @@
+{
+  "000660": { "quantity": 9, "avg_price": 872722, "market" : "KR"},
+  "005930": { "quantity": 4, "avg_price": 226400,"market" : "KR" },
+  "GOOGL" : {"quantity": 15,"avg_price": 311.1107,"market" : "US"},
+  "MRVL" : {"quantity": 4,"avg_price": 203.4,"market" : "US"},
+  "WDC" : {"quantity": 3,"avg_price": 493.27,"market" : "US"},
+  "NVDA":{"quantity": 10,"avg_price": 210.69,"market" : "US"},
+  "TQQQ":{"quantity" : 11,"avg_price" : 76, "market" : "US"}
+}

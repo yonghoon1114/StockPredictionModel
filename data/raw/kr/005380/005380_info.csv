@@ -1,0 +1,2 @@
+ticker_yf,name,current_price,shares_outstanding,net_income,market_cap,PER,PBR,ROE,ROA,operating_margin,net_margin,revenue_growth,earnings_growth,debt_to_equity,current_ratio,total_revenue,free_cashflow,sector,industry
+005380.KS,Hyundai Motor Company,613000.0,202416066,8093845946368,124081048458000.0,15.33,,0.0754,0.01778,0.05474,0.04592,0.034,-0.431,139.511,1.31,187785600303104,-3826139267072,Consumer Cyclical,Auto Manufacturers

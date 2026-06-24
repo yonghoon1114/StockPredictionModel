@@ -1,0 +1,52 @@
+{
+  "date": "2026-06-23 13:46:03",
+  "ticker": "PLTR",
+  "market": "US",
+  "current_price": 119.5,
+  "analysis": {
+    "company_type": [
+      "초고성장주",
+      "대형 우량주"
+    ],
+    "company_type_reason": "매출 YoY 84.7%의 폭발적 성장세와 영업이익률 46.18%라는 초고성장주로서의 면모, 동시에 견고한 현금흐름을 확보한 대형 기술기업의 특징을 모두 보유.",
+    "weight_applied": "초고성장주 가중치 적용 (성장성 45%, TAM 25%, 경쟁우위 20%, 재무건전성 10%)",
+    "growth_analysis": {
+      "quality": "구조적 성장",
+      "sustainability": "정부 및 민간 부문의 AI 도입 가속화로 인해 향후 3~5년간 고성장 지속 가능",
+      "rule_of_40": "84.7(매출성장률) + 46.18(영업이익률) = 130.88 (매우 건강한 수준)"
+    },
+    "market_opportunity": "국방/공공 부문에서의 독점적 지위와 민간 Enterprise 시장의 AIP 도입 확대로 TAM은 기하급수적으로 확대 중",
+    "competitive_advantage": "높은 전환비용(데이터 통합 역량), 정부급 보안 표준, 독보적인 AI 플랫폼(AIP)의 네트워크 효과",
+    "valuation_method": "PEG Ratio 및 EV/Sales",
+    "valuation_analysis": "단순 PER 134는 부담스러우나, 순이익 YoY 325% 및 매출 성장률을 고려한 PEG는 낮아짐. 현재 성장의 가속도를 감안할 때 프리미엄은 충분히 정당화됨",
+    "risks": [
+      "성장 둔화 리스크",
+      "지정학적 리스크에 따른 정부 예산 변동성",
+      "높은 밸류에이션으로 인한 주가 변동성"
+    ],
+    "conclusion": {
+      "price_evaluation": "적정가",
+      "fair_value_range": "110~135 USD (성장 추세 유지 시)",
+      "investment_score": 85,
+      "growth_score": 95,
+      "value_score": 60,
+      "strengths": [
+        "압도적인 영업이익률",
+        "구조적인 매출 성장",
+        "강력한 현금흐름 창출력"
+      ],
+      "key_risks": [
+        "성장률 둔화 시 밸류에이션 조정 가능성",
+        "정부 의존도",
+        "높은 주가 변동성"
+      ],
+      "five_year_outlook": "AI 기반 데이터 운영체제의 사실상 표준(de-facto standard)으로 자리 잡으며 매출과 이익의 동반 상승 예상",
+      "suitable_investor": [
+        "성장주 투자자",
+        "장기 보유 가능한 기술주 선호 투자자"
+      ],
+      "final_opinion": "매수"
+    },
+    "caution": "본 분석은 현재의 높은 성장률이 유지된다는 가정을 바탕으로 함. 향후 분기별 매출 성장률이 40% 이하로 하락할 경우 밸류에이션 재평가가 필요함."
+  }
+}

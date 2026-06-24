@@ -1,2 +1,2 @@
-name,industry,ceo,stock_code,listing_date,capital
-에스케이하이닉스(주),2612,곽노정,000660,,
+ticker_yf,name,current_price,shares_outstanding,net_income,market_cap,PER,PBR,ROE,ROA,operating_margin,net_margin,revenue_growth,earnings_growth,debt_to_equity,current_ratio,total_revenue,free_cashflow,sector,industry
+000660.KS,SK hynix Inc.,2555000.0,709854891,75142382223360,1813679246505000.0,24.14,,0.61172,0.27888,0.71535003,0.5689,1.981,3.966,13.282,2.617,132083817119744,25809054072832,Technology,Semiconductors
