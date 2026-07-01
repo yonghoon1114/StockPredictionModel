@@ -15,7 +15,7 @@ const API_BASE = (() => {
     const swapped = hostname.replace(/-\d+\./, "-8000.");
     return `${protocol}//${swapped}`;
   }
-  return "http://localhost:8000";
+  return "https://scaling-space-guide-x5pqq57x9pvcpv96-8000.app.github.dev";
 })();
 
 // -----------------------------------------------------------------------
@@ -146,6 +146,91 @@ function AddHoldingModal({ onClose, onAdded }) {
           {error && <div className="form-error">{error}</div>}
           <button type="submit" className="btn-primary" disabled={submitting}>
             {submitting ? <Loader2 size={16} className="spin" /> : "추가하기"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function AddAnalyzeModal({
+  onClose,
+  setSelectedStock,
+}) {
+  const [ticker, setTicker] = useState("");
+  const [market, setMarket] = useState("US");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const stockTicker = ticker.trim().toUpperCase();
+
+    if (!stockTicker) return;
+
+    setSelectedStock({
+      ticker: stockTicker,
+      market,
+    });
+
+    onClose();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>AI 종목 분석</h3>
+
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={onClose}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="modal-form">
+
+          <div className="form-row">
+            <label>시장</label>
+
+            <div className="market-toggle">
+              <button
+                type="button"
+                className={market === "US" ? "active" : ""}
+                onClick={() => setMarket("US")}
+              >
+                미국
+              </button>
+
+              <button
+                type="button"
+                className={market === "KR" ? "active" : ""}
+                onClick={() => setMarket("KR")}
+              >
+                한국
+              </button>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label>티커 / 종목코드</label>
+
+            <input
+              value={ticker}
+              onChange={(e) => setTicker(e.target.value)}
+              placeholder={market === "US" ? "AAPL" : "005930"}
+              autoFocus
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn-primary"
+          >
+            분석하기
           </button>
         </form>
       </div>
@@ -421,6 +506,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAnalyzeModal, setShowAnalyzeModal] = useState(false);
   const [selectedStock, setSelectedStock] = useState(null);
   const [diagnosing, setDiagnosing] = useState(false);
   const [diagnosis, setDiagnosis] = useState(null);
@@ -458,7 +544,17 @@ export default function App() {
     loadPortfolio();
   };
 
-  const totalValue = holdings.reduce((sum, h) => sum + (h.current_price || 0) * (h.quantity || 0), 0);
+  const totalValue = holdings.reduce((totals, h) => {
+    const currency =
+      h.currency ||
+      (h.market === "US" ? "USD" : "KRW");
+
+    const value = (h.current_price || 0) * (h.quantity || 0);
+
+    totals[currency] = (totals[currency] || 0) + value;
+
+    return totals;
+  }, {});
   const totalCost = holdings.reduce((sum, h) => sum + (h.avg_price || 0) * (h.quantity || 0), 0);
   const totalProfit = totalValue - totalCost;
   const totalProfitPct = totalCost ? (totalProfit / totalCost) * 100 : 0;
@@ -490,8 +586,11 @@ export default function App() {
           </div>
 
           <div className="total-summary">
-            <div className="total-value">{formatNumber(totalValue)}</div>
-            <ProfitBadge pct={totalProfitPct} />
+           {Object.entries(totalValue).map(([currency, total]) => (
+            <div key={currency} className="total-value">
+              {currency}: {formatNumber(total)}
+            </div>
+          ))}
           </div>
 
           {error && (
@@ -556,6 +655,9 @@ export default function App() {
               <>AI 포트폴리오 진단 실행 <ChevronRight size={16} /></>
             )}
           </button>
+            <button className="btn-icon-add"  style={{ marginTop: "10px" }} onClick={() => setShowAnalyzeModal(true)}>
+            <Plus size={15} /> 개별 종목 분석
+            </button>
         </section>
 
         {/* 우측: 분석 결과 */}
@@ -583,6 +685,13 @@ export default function App() {
       {showAddModal && (
         <AddHoldingModal onClose={() => setShowAddModal(false)} onAdded={loadPortfolio} />
       )}
+      {showAnalyzeModal && (
+        <AddAnalyzeModal
+          onClose={() => setShowAnalyzeModal(false)}
+          setSelectedStock={setSelectedStock}
+        />
+      )}
+
 
       {selectedStock && (
         <StockAnalysisPanel
